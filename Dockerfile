@@ -1,3 +1,3 @@
-FROM caddy:alpine
+FROM caddy:2.4.1-alpine
 COPY Caddyfile /etc/caddy/Caddyfile
-COPY srv/ /data/ipv6test.io/
+COPY srv/ /usr/share/caddy/
