@@ -22,7 +22,7 @@ handle @cli {
 
 handle /ip {
     header {
-        Cache-Control               no-store, max-age=0, must-revalidate
+        Cache-Control               "no-store, max-age=0, must-revalidate"
         Content-Type                "text/plain; charset=UTF-8"
         Strict-Transport-Security   max-age=31536000
     }
@@ -32,7 +32,7 @@ handle /ip {
 handle {
     route {
         header {
-            Cache-Control               no-store, max-age=0, must-revalidate
+            Cache-Control               "no-store, max-age=0, must-revalidate"
             Content-Security-Policy     "script-src 'self'"
             Referrer-Policy             no-referrer-when-downgrade
             Strict-Transport-Security   "max-age=63072000; includeSubDomains"
