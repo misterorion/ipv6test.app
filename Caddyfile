@@ -1,7 +1,7 @@
 :80
 file_server
 templates
-root * /data/ipv6test.io
+root * /usr/share/caddy
 
 @encode_exts {
     path / *.html *.js *.css *.svg
