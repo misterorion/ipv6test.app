@@ -7,9 +7,9 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Test your IPv6 connectivity on a dualstack load balancer.">
-    {{- if eq $hostName "v4.ipv6test.io"}}
+    {{- if eq $hostName "v4.mechapower.com"}}
     <title>IPv4-Only Test Page</title>
-    {{- else if eq $hostName "v6.ipv6test.io"}}
+    {{- else if eq $hostName "v6.mechapower.com"}}
     <title>IPv6-Only Test Page</title>
     {{- else}}
     <title>Dualstack IPv6/IPv4 Test Page</title>
@@ -19,7 +19,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
     <link rel="manifest" href="/assets/site.webmanifest">
-    <link rel="canonical" href="https://ipv6test.io" />
+    <link rel="canonical" href="https://ipv6test.mechapower.com" />
   </head>
   <body>
     <div class="container">
@@ -27,9 +27,9 @@
         <div class="col-sm-12">
           <div class="centered">
             <div class="button-menu">
-              <a href="https://ipv6test.io/" class="button">Dualstack Page</a>
-              <a href="https://v6.ipv6test.io/" class="button">IPv6-Only Page</a>
-              <a href="https://v4.ipv6test.io/" class="button">IPv4-Only Page</a>
+              <a href="https://ipv6test.mechapower.com/" class="button">Dualstack Page</a>
+              <a href="https://v6.mechapower.com/" class="button">IPv6-Only Page</a>
+              <a href="https://v4.mechapower.com/" class="button">IPv4-Only Page</a>
             </div>
             <div id="emoji"></div>
             <h3 id="message"></h3>
