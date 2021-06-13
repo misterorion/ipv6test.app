@@ -1,6 +1,6 @@
 {{- $hostName := .Host -}}
 {{- $xff := .Req.Header.Get "X-Forwarded-For" -}}
-{{- $ip := split ", " $xff -}}
+{{- $ip := split "," $xff -}}
 {{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
 <!DOCTYPE html>
 <html lang="en">
