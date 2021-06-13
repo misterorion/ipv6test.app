@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  ipv6test:
+    image: caddy:2.4.1-alpine
+    container_name: ipv6test
+    restart: always
+    ports: 
+      - 80:80
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./srv:/usr/share/caddy
