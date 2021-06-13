@@ -38,6 +38,7 @@ body {
 }
 .button {
   font-weight: 700;
+  border: 2px solid purple;
 }
 #emoji {
   margin-top: 2rem;
@@ -116,7 +117,7 @@ footer {
   .button {
     margin: 0.1rem !important;
   }
-  .ip6-addr-mobile {
+  pre.curl {
     font-size: 0.7rem;
   }
 }
@@ -124,7 +125,7 @@ footer {
   .button-menu {
     font-size: 0.5rem;
   }
-  .ip6-addr-mobile {
+  pre.curl {
     font-size: 0.6rem;
   }
   h3 {
