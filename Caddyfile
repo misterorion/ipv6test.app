@@ -17,7 +17,6 @@ respond /markdown/* 404
 
 handle @cli {
     header Content-Type "text/plain; charset=UTF-8"
-    respond "{{.RemoteIP}}"
     # respond "{{ (splitList \",\" (.Req.Header.Get \"X-Forwarded-For\"))[0] }}"
 }
 
@@ -27,8 +26,7 @@ handle /ip {
         Content-Type                "text/plain; charset=UTF-8"
         Strict-Transport-Security   max-age=31536000
     }
-    # respond "{{ (splitList \",\" (.Req.Header.Get \"X-Forwarded-For\"))[0] }}"
-    respond "{{.RemoteIP}}"
+    respond "{{ .Req.Header.Get \"X-Forwarded-For\" | splitList \",\" }}"
 }
 
 handle {
