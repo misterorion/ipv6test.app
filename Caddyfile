@@ -17,7 +17,7 @@ respond /markdown/* 404
 
 handle @cli {
     header Content-Type "text/plain; charset=UTF-8"
-    respond "{{ .Req.Header.Get \"X-Forwarded-For\" 0 }}"
+    respond "{{ (.Req.Header.Get \"X-Forwarded-For\" | split ",") 0 }}"
 }
 
 handle /ip {
@@ -26,16 +26,16 @@ handle /ip {
         Content-Type                "text/plain; charset=UTF-8"
         Strict-Transport-Security   max-age=31536000
     }
-    respond "{{ .Req.Header.Get \"X-Forwarded-For\" 0 }}"
+    respond "{{ (.Req.Header.Get \"X-Forwarded-For\" | split ",") 0 }}"
 }
 
 handle {
     route {
         header {
             Cache-Control               no-store, max-age=0, must-revalidate
-            Content-Security-Policy     "script-src 'self' 'unsafe-inline'"
+            Content-Security-Policy     "script-src 'self'"
             Referrer-Policy             no-referrer-when-downgrade
-            Strict-Transport-Security   "max-age=63072000; includeSubDomains; preload"
+            Strict-Transport-Security   "max-age=63072000; includeSubDomains"
             X-Content-Type-Options      nosniff
             X-Frame-Options             DENY
             X-XSS-Protection            "1; mode=block"
