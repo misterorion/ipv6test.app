@@ -1,0 +1,16 @@
+{
+  "name": "ipv6test",
+  "scripts": {
+    "minifyJS": "uglifyjs src/confetti.js src/report.js -c -m -o srv/assets/scripts.min.js",
+    "buildCSS": "postcss src/tailwind.css -o srv/assets/styles.min.css",
+    "build": "npm run minifyJS && npm run buildCSS"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.2.6",
+    "cssnano": "^5.0.6",
+    "postcss": "^8.3.2",
+    "postcss-cli": "^8.3.1",
+    "tailwindcss": "^2.1.4",
+    "uglify-js": "^3.13.9"
+  }
+}
