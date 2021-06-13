@@ -1,0 +1,1 @@
+The domain serving this page uses a DNS A record assigned to an IPv4 address. That means this page is only viewable over IPv4. Don't fret if you see an IPv4 address above. You should notify your ISP that you want IPv6 enabled in your area.

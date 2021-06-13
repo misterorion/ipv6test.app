@@ -1,0 +1,45 @@
+:80
+file_server
+templates
+root * /data/ipv6test.io
+
+@encode_exts {
+    path / *.html *.js *.css *.svg
+}
+encode @encode_exts gzip
+
+respond /markdown/* 404
+respond /health-check 200
+
+@cli {
+    header_regexp ua User-Agent (^curl|^[Ww]get|^HTTPie)
+}
+
+handle @cli {
+    header Content-Type "text/plain; charset=UTF-8"
+    respond "{{ .Req.Header.Get \"X-Forwarded-For\" }}"
+}
+
+handle /ip {
+    header {
+        Cache-Control               no-store
+        Content-Type                "text/plain; charset=UTF-8"
+        Strict-Transport-Security   max-age=31536000
+    }
+    respond "{{ .Req.Header.Get \"X-Forwarded-For\" }}"
+}
+
+handle {
+    route {
+        header {
+            Cache-Control               no-store
+            Content-Security-Policy     "script-src 'self' 'unsafe-inline'"
+            Referrer-Policy             no-referrer-when-downgrade
+            Strict-Transport-Security   "max-age=63072000; includeSubDomains; preload"
+            X-Content-Type-Options      nosniff
+            X-Frame-Options             DENY
+            X-XSS-Protection            "1; mode=block"
+        }
+        header /assets/* Cache-Control  max-age=31536000
+    }
+}

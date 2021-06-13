@@ -1,0 +1,65 @@
+{{- $hostName := .Host -}}
+{{- $xff := .Req.Header.Get "X-Forwarded-For" -}}
+{{- $ip := split ", " $xff -}}
+{{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Test your IPv6 connectivity on a dualstack load balancer.">
+    {{- if eq $hostName "v4.ipv6test.io"}}
+    <title>IPv4-Only Test Page</title>
+    {{- else if eq $hostName "v6.ipv6test.io"}}
+    <title>IPv6-Only Test Page</title>
+    {{- else}}
+    <title>Dualstack IPv6/IPv4 Test Page</title>
+    {{ end -}}
+    <link rel="stylesheet" type="text/css" href="/assets/styles.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+    <link rel="manifest" href="/assets/site.webmanifest">
+    <link rel="canonical" href="https://ipv6test.io" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="centered">
+            <div class="button-menu">
+              <a href="https://ipv6test.io/" class="button">Dualstack Page</a>
+              <a href="https://v6.ipv6test.io/" class="button">IPv6-Only Page</a>
+              <a href="https://v4.ipv6test.io/" class="button">IPv4-Only Page</a>
+            </div>
+            <div id="emoji"></div>
+            <h3 id="message"></h3>
+            <div class="cmd" style="background-color: green; color: #FAFAFA;">Your IP Address</div>
+            <pre id="ip" class="curl" style="border-color: green;">{{ $ip._0 }}</pre>
+            <div class="cmd">X-Forwarded-For</div>
+            <pre class="curl">{{ $xff }}</pre>
+            <div id="wall-of-text">
+              {{- if eq $hostName "v4.ipv6test.io" -}}
+                {{- include "/markdown/ipv4.md" | markdown | wrap 80 | nindent 14 }}
+              {{- else if eq $hostName "v6.ipv6test.io" -}}
+                {{include "/markdown/ipv6.md" | markdown | wrap 80 | nindent 14 }}
+              {{- else -}}
+                {{include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 14 }}
+              {{- end -}}
+            </div>
+            <h3>Get your IP from the command line!</h3>
+            <div class="cmd">cURL</div>
+            <pre class="curl">curl {{ $hostName }}</pre>
+            <div class="cmd">HTTPie</div>
+            <pre class="curl">http -b {{ $hostName }}</pre>
+            <div class="cmd">Wget</div>
+            <pre class="curl">wget -qO- {{ $hostName }}</pre>
+            <div class="cmd">Plain output (any User-Agent)</div>
+            <pre class="curl">http://{{ $hostName }}/ip</pre>
+            <footer>Page generated on: {{ $now }}</footer>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="/assets/scripts.js"></script>
+  </body>
+</html>

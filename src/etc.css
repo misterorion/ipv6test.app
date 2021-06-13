@@ -1,0 +1,133 @@
+@font-face {
+  font-family: "Cascadia";
+  src: url("./CascadiaCode.woff2");
+  font-display: swap;
+}
+body {
+  background-color: #FAFAFA;
+  color: #212121;
+}
+.ip-addr {
+  padding: 1rem;
+  font-size: 1.4rem;
+  display: inline-block;
+  font-family: "Cascadia", monospace;
+  color: #FAFAFA;
+}
+.happy-green {
+  background-color: #1B5E20;
+}
+.sad-red {
+  background-color: #bf360c;
+}
+.container {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto;
+}
+#wall-of-text {
+  text-align: left;
+  margin-top: 2rem;
+}
+.centered {
+  text-align: center;
+  margin-top: 2rem;
+}
+.button-menu {
+  margin-bottom: 3rem;
+}
+.button {
+  font-weight: 700;
+}
+#emoji {
+  margin-top: 2rem;
+  font-size: 6rem;
+}
+.cmd {
+  margin-top: 3rem;
+  margin-bottom: 0;
+  padding: 0.4rem 0 0.4rem 0;
+  border-top-left-radius: 0.125rem;
+  border-top-right-radius: 0.125rem;
+  background-color: #d8dee9;
+  color: #2e3440;
+  font-size: 1rem;
+  font-weight: 700;
+}
+h3 {
+  margin-top: 2rem;
+}
+code,
+pre {
+  font-family: "Cascadia", monospace;
+  white-space: pre-line;
+  margin: 0;
+  padding: 0.6rem 0 0.6rem 1rem;
+  border-top: 0;
+  border-bottom: 0.25rem solid #d8dee9;
+  border-left: 0.25rem solid #d8dee9;
+  border-right: 0.25rem solid #d8dee9;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0.125rem;
+  border-bottom-right-radius: 0.125rem;
+  color: #2e3440;
+}
+pre.curl {
+  font-size: 1.2rem;
+  background: #FAFAFA;
+}
+footer {
+  margin-top: 2rem;
+  background-color: #FAFAFA;
+}
+@media (max-width: 600px) {
+  .button-menu {
+    font-size: 0.7rem;
+  }
+  .ip6-addr-mobile {
+    font-size: 0.9rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+  }
+  #wall-of-text > p {
+    font-size: 0.9rem;
+  }
+}
+@media (max-width: 410px) {
+  .button-menu {
+    font-size: 0.6rem;
+  }
+  .ip6-addr-mobile {
+    font-size: 0.8rem;
+  }
+  h3 {
+    font-size: 0.9rem;
+  }
+  #wall-of-text > p {
+    font-size: 0.8rem;
+  }
+  footer {
+    font-size: 0.8rem;
+  }
+}
+@media (max-width: 360px) {
+  .button {
+    margin: 0.1rem !important;
+  }
+  .ip6-addr-mobile {
+    font-size: 0.7rem;
+  }
+}
+@media (max-width: 320px) {
+  .button-menu {
+    font-size: 0.5rem;
+  }
+  .ip6-addr-mobile {
+    font-size: 0.6rem;
+  }
+  h3 {
+    font-size: 0.8rem;
+  }
+}
