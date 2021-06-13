@@ -35,8 +35,8 @@
             <h3 id="message"></h3>
             <div class="cmd" style="background-color: green; color: #FAFAFA;">Your IP Address</div>
             <pre id="ip" class="curl" style="border-color: green;">{{ $ip._0 }}</pre>
-            <div class="cmd">X-Forwarded-For</div>
-            <pre class="curl">{{ $xff }}</pre>
+            <!-- <div class="cmd">X-Forwarded-For</div>
+            <pre class="curl">{{ $xff }}</pre> -->
             <div id="wall-of-text">
               {{- if eq $hostName "v4.ipv6test.io" -}}
                 {{- include "/markdown/ipv4.md" | markdown | wrap 80 | nindent 14 }}
