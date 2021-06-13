@@ -9,7 +9,7 @@ root * /usr/share/caddy
 encode @encode_exts gzip
 
 respond /markdown/* 404
-respond /health-check 200
+# respond /health-check 200
 
 @cli {
     header_regexp ua User-Agent (^curl|^[Ww]get|^HTTPie)
@@ -17,22 +17,22 @@ respond /health-check 200
 
 handle @cli {
     header Content-Type "text/plain; charset=UTF-8"
-    respond "{{ .Req.Header.Get \"X-Forwarded-For\" }}"
+    respond "{{ .Req.Header.Get \"X-Forwarded-For\" 0 }}"
 }
 
 handle /ip {
     header {
-        Cache-Control               no-store
+        Cache-Control               no-store, max-age=0, must-revalidate
         Content-Type                "text/plain; charset=UTF-8"
         Strict-Transport-Security   max-age=31536000
     }
-    respond "{{ .Req.Header.Get \"X-Forwarded-For\" }}"
+    respond "{{ .Req.Header.Get \"X-Forwarded-For\" 0 }}"
 }
 
 handle {
     route {
         header {
-            Cache-Control               no-store
+            Cache-Control               no-store, max-age=0, must-revalidate
             Content-Security-Policy     "script-src 'self' 'unsafe-inline'"
             Referrer-Policy             no-referrer-when-downgrade
             Strict-Transport-Security   "max-age=63072000; includeSubDomains; preload"
