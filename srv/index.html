@@ -1,5 +1,6 @@
 {{- $hostName := .Host -}}
-{{- $ip := first (.Req.Header.Get "X-Forwarded-For" | splitList ",") -}}
+{{- $xff := splitList "," .Req.Header.Get "X-Forwarded-For" -}}
+{{- $ip := first $xff -}}
 {{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
 <!DOCTYPE html>
 <html lang="en">
@@ -42,9 +43,9 @@
       </div>
     </div>
     <div id="wall-of-text">
-      {{- if eq $hostName "v4.ipv6test.io" -}}
+      {{- if eq $hostName "v4.mechapower.com" -}}
       {{- include "/markdown/ipv4.md" | markdown | wrap 80 | nindent 14 }}
-      {{- else if eq $hostName "v6.ipv6test.io" -}}
+      {{- else if eq $hostName "v6.mechapower.com" -}}
       {{include "/markdown/ipv6.md" | markdown | wrap 80 | nindent 14 }}
       {{- else -}}
       {{include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 14 }}
