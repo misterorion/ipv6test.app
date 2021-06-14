@@ -1,5 +1,5 @@
 {{- $hostName := .Host -}}
-{{- $ip := first (splitList "," .Req.Header.Get "X-Forwarded-For") -}}
+{{- $ip := first (.Req.Header.Get "X-Forwarded-For" | splitList ",") -}}
 {{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
 <!DOCTYPE html>
 <html lang="en">
