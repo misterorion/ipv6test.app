@@ -1,6 +1,5 @@
 {{- $hostName := .Host -}}
-{{- $xff := splitList "," .Req.Header.Get "X-Forwarded-For" -}}
-{{- $ip := first $xff -}}
+{{- $ip := first (splitList "," .Req.Header.Get "X-Forwarded-For") -}}
 {{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
 <!DOCTYPE html>
 <html lang="en">
@@ -39,7 +38,7 @@
         Your IP Address
       </div>
       <div id="ip" class="text-center py-5 text-sm md:text-3xl monospace">
-        {{ $ip._0 }}
+        {{ $ip }}
       </div>
     </div>
     <div id="wall-of-text">
