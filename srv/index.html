@@ -1,4 +1,5 @@
 {{- $hostName := .Host -}}
+{{- $xff := .Req.Header.Get "X-Forwarded-For" -}}
 {{- $ip := first (.Req.Header.Get "X-Forwarded-For" | splitList ",") -}}
 {{- $now := now | date "Jan 2, 2006 15:04:05 MST" -}}
 <!DOCTYPE html>
@@ -28,6 +29,9 @@
       <a href="https://ipv6test.mechapower.com/" class="nav-button" rel="noreferrer">Dualstack Page</a>
       <a href="https://v6.mechapower.com/" class="nav-button" rel="noreferrer">IPv6-Only Page</a>
       <a href="https://v4.mechapower.com/" class="nav-button" rel="noreferrer">IPv4-Only Page</a>
+    </div>
+    <div>
+      {{ $xff }}
     </div>
     <div id="emoji" class="text-8xl h-64 flex items-center justify-center"></div>
     <div class="text-center text-2xl py-5">
