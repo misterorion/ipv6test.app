@@ -32,7 +32,7 @@ handle {
         header {
             Cache-Control               "no-store"
             Content-Security-Policy     "script-src 'self'"
-            Referrer-Policy             "no-referrer-when-downgrade"
+            Referrer-Policy             "no-referrer"
             Strict-Transport-Security   "max-age=63072000; includeSubDomains"
             X-Content-Type-Options      "nosniff"
             X-Frame-Options             "DENY"
