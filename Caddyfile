@@ -32,6 +32,7 @@ handle {
         header {
             Cache-Control               "no-store"
             Content-Security-Policy     "script-src 'self'"
+            Permissions-Policy          "geolocation=()"
             Referrer-Policy             "no-referrer"
             Strict-Transport-Security   "max-age=63072000; includeSubDomains"
             X-Content-Type-Options      "nosniff"
