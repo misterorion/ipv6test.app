@@ -1,3 +1,4 @@
-FROM caddy:2.4.3-alpine
+ARG caddy_image
+FROM caddy_image
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY srv/ /usr/share/caddy/

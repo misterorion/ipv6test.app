@@ -1,14 +1,19 @@
 steps:
+  - name: $_NODE_IMAGE
+    args:
+      - build
+    id: Build Assets
+    entrypoint: yarn
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - '--no-cache'
+      - '--build-arg'
+      - 'caddy_image=$_CADDY_IMAGE'
       - '-t'
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - .
-      - '-f'
-      - Dockerfile
-    id: Build
+    id: Build Caddy
   - name: gcr.io/cloud-builders/docker
     args:
       - push
