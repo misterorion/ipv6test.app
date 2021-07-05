@@ -13,14 +13,14 @@ steps:
         ) || true
     id: 'fetch-cache'
     entrypoint: sh
-  - name: $_BUILDER_REPO/$_NODE_IMAGE
+  - name: $_BUILDERS_REPO/$_NODE_IMAGE
     args:
       - '-c'
       - |
         test -f cache.tar.gz || yarn install
     id: 'yarn-install'
     entrypoint: sh
-  - name: $_BUILDER_REPO/$_NODE_IMAGE
+  - name: $_BUILDERS_REPO/$_NODE_IMAGE
     args:
       - build
     id: 'yarn-build'
@@ -29,7 +29,7 @@ steps:
     args:
       - build
       - '--build-arg'
-      - 'caddy_image=$_BUILDER_REPO/$_CADDY_IMAGE'
+      - 'caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE'
       - '-t'
       - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
       - '--no-cache'
