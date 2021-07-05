@@ -64,5 +64,3 @@ steps:
         ) || true
     id: 'save-cache'
     entrypoint: sh
-images:
-  - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
