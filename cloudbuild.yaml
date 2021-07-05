@@ -34,12 +34,12 @@ steps:
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - '--no-cache'
       - .
-    id: 'docker-build'
+    id: 'build-container'
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
-    id: Push
+    id: 'push-container'
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
       - run
@@ -50,7 +50,19 @@ steps:
       - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
-    id: Deploy
+    id: 'update-service'
     entrypoint: gcloud
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+        (
+          set -e
+          test ! -f cache.tar.gz
+          tar -zcf cache.tar.gz node_modules
+          gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
+        ) || true
+    id: 'save-cache'
+    entrypoint: sh
 images:
   - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
