@@ -13,14 +13,14 @@ steps:
         ) || true
     id: 'fetch-cache'
     entrypoint: sh
-  - name: $_NODE_IMAGE
+  - name: $_BUILDER_REPO/$_NODE_IMAGE
     args:
       - '-c'
       - |
         test -f cache.tar.gz || yarn install
     id: 'yarn-install'
     entrypoint: sh
-  - name: $_NODE_IMAGE
+  - name: $_BUILDER_REPO/$_NODE_IMAGE
     args:
       - build
     id: 'yarn-build'
@@ -29,16 +29,16 @@ steps:
     args:
       - build
       - '--build-arg'
-      - 'caddy_image=$_CADDY_IMAGE'
+      - 'caddy_image=$_BUILDER_REPO/$_CADDY_IMAGE'
       - '-t'
-      - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
       - '--no-cache'
       - .
     id: 'build-container'
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
     id: 'push-container'
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     args:
@@ -47,7 +47,7 @@ steps:
       - update
       - $_SERVICE_NAME
       - '--platform=managed'
-      - '--image=$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+      - '--image=$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
       - '--region=$_DEPLOY_REGION'
       - '--quiet'
     id: 'update-service'
@@ -65,4 +65,4 @@ steps:
     id: 'save-cache'
     entrypoint: sh
 images:
-  - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
+  - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
