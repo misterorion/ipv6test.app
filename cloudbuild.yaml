@@ -1,8 +1,29 @@
 steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - |
+        (
+          set -e
+          gsutil hash -h yarn.lock | grep md5 | tr -s " " | awk '{print $3}' > hashed.yarn-lock
+          gsutil -m cp "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)" cache.tar.gz 2> /dev/null
+          test -f cache.tar.gz
+          tar -zxf cache.tar.gz
+          echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
+        ) || true
+    id: 'fetch-cache'
+    entrypoint: sh
+  - name: $_NODE_IMAGE
+    args:
+      - '-c'
+      - |
+        test -f cache.tar.gz || yarn install
+    id: 'yarn-install'
+    entrypoint: sh
   - name: $_NODE_IMAGE
     args:
       - build
-    id: Build Assets
+    id: 'yarn-build'
     entrypoint: yarn
   - name: gcr.io/cloud-builders/docker
     args:
@@ -13,7 +34,7 @@ steps:
       - '-t'
       - '$_GCR_HOSTNAME/$PROJECT_ID/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA'
       - .
-    id: Build Caddy
+    id: 'docker-build'
   - name: gcr.io/cloud-builders/docker
     args:
       - push
