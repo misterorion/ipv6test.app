@@ -1,6 +1,7 @@
 steps:
 # If a cache exists, fetch it from Cloud Storage
 - name: gcr.io/cloud-builders/gcloud
+  id: 'Fetch cache'
   entrypoint: sh
   args:
     - '-c'
@@ -15,6 +16,7 @@ steps:
       ) || true
 # Install Node dependencies
 - name: $_BUILDERS_REPO/$_NODE_IMAGE
+  id: 'Yarn install'
   entrypoint: sh
   args:
     - '-c'
@@ -22,10 +24,12 @@ steps:
       test -f cache.tar.gz || yarn install
 # Build CSS and JS
 - name: $_BUILDERS_REPO/$_NODE_IMAGE
+  id: 'Yarn build'
   entrypoint: yarn
   args: ['build']
 # Build the Caddy Docker image
 - name: gcr.io/cloud-builders/docker
+  id: 'Build Caddy image'
   args:
     - build
     - '--build-arg'
@@ -36,9 +40,11 @@ steps:
     - .
 # Push the Caddy Docker iamge
 - name: gcr.io/cloud-builders/docker
+  id: 'Push Caddy image'
   args: ['push', '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA']
 # Update Cloud Run service
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  id: 'Update Cloud Run service'
   entrypoint: gcloud
   args:
     - run
@@ -51,6 +57,7 @@ steps:
     - '--quiet'
 # Save the Node cache
 - name: gcr.io/cloud-builders/gcloud
+  id: 'Save cache'
   entrypoint: sh
   args:
     - '-c'
