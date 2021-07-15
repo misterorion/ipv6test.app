@@ -35,13 +35,13 @@ steps:
     - '--build-arg'
     - 'caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE'
     - '-t'
-    - '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+    - '$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT'
     - '--no-cache'
     - .
 # Push the Caddy Docker iamge
 - name: gcr.io/cloud-builders/docker
   id: 'Push Caddy image'
-  args: ['push', '$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA']
+  args: ['push', '$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT']
 # Update Cloud Run service
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
   id: 'Update Cloud Run service'
@@ -52,7 +52,7 @@ steps:
     - update
     - $_SERVICE_NAME
     - '--platform=managed'
-    - '--image=$_APP_REPO/$_SERVICE_NAME:$COMMIT_SHA'
+    - '--image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT'
     - '--region=$_DEPLOY_REGION'
     - '--quiet'
 # Save the Node cache
