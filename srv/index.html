@@ -26,7 +26,7 @@
   <link rel="dns-prefetch" href="//v4.mechapower.com/">
   {{- else}}
   <link rel="dns-prefetch" href="//v4.mechapower.com/">
-  {{ end -}}
+  {{- end }}
 </head>
 
 <body>
@@ -90,7 +90,9 @@
         http://{{ $hostName }}/ip
       </div>
     </div>
-    <footer class="text-center text-sm border-t border-gray-200 py-5 mt-2">Page generated on: {{ $now }}</footer>
+    <footer class="text-center text-sm border-t border-gray-200 py-5 mt-2">
+      Page generated on: {{ $now }}
+    </footer>
   </div>
   <script src="/assets/scripts.min.js"></script>
 </body>
