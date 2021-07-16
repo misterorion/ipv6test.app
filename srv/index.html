@@ -24,8 +24,12 @@
   {{- if eq $hostName "ipv6test.mechapower.com"}}
   <link rel="dns-prefetch" href="//v6.mechapower.com/">
   <link rel="dns-prefetch" href="//v4.mechapower.com/">
-  {{- else}}
+  {{- else if eq $hostName "v6.mechapower.com"}}
+  <link rel="dns-prefetch" href="//ipv6test.mechapower.com/">
   <link rel="dns-prefetch" href="//v4.mechapower.com/">
+  {{- else}}
+  <link rel="dns-prefetch" href="//ipv6test.mechapower.com/">
+  <link rel="dns-prefetch" href="//v6.mechapower.com/">
   {{- end }}
 </head>
 
