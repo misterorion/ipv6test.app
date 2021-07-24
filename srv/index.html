@@ -45,10 +45,10 @@
       {{- if eq $hostName "v4.ipv6test.app" -}}
       {{- include "/markdown/ipv4.md" | markdown | wrap 80 | nindent 6 }}
       {{- else if eq $hostName "v6.ipv6test.app" -}}
-      {{include "/markdown/ipv6.md" | markdown | wrap 80 | nindent 6 }}
+      {{ include "/markdown/ipv6.md" | markdown | wrap 80 | nindent 6 }}
       {{- else -}}
-      {{include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 6 -}}
-      {{- end }}
+      {{ include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 6 }}
+      {{- end -}}
     </div>
     <h3 class="text-center text-2xl py-5">Get your IP from the command line!</h3>
     <div class="cmd-container">
