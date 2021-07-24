@@ -8,9 +8,9 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Test your IPv6 connectivity on a dualstack load balancer.">
-  {{- if eq $hostName "v4.mechapower.com"}}
+  {{- if eq $hostName "v4.ipv6test.app"}}
   <title>IPv4-Only Test Page</title>
-  {{- else if eq $hostName "v6.mechapower.com"}}
+  {{- else if eq $hostName "v6.ipv6test.app"}}
   <title>IPv6-Only Test Page</title>
   {{- else}}
   <title>Dualstack IPv6/IPv4 Test Page</title>
@@ -20,15 +20,15 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
   <link rel="manifest" href="/assets/site.webmanifest">
-  <link rel="canonical" href="https://ipv6test.mechapower.com" />
+  <!-- <link rel="canonical" href="https://ipv6test.app" /> -->
 </head>
 
 <body>
   <div class="mx-2 md:container md:mx-auto md:max-w-screen-md py-5">
     <div class="flex py-5 justify-center space-x-4 font-bold text-center sticky top-0 bg-white bg-opacity-75">
-      <a href="https://ipv6test.mechapower.com/" class="nav-button" rel="noopener">Dualstack Page</a>
-      <a href="https://v6.mechapower.com/" class="nav-button" rel="noopener">IPv6-Only Page</a>
-      <a href="https://v4.mechapower.com/" class="nav-button" rel="noopener">IPv4-Only Page</a>
+      <a href="https://ipv6test.app/" class="nav-button" rel="noopener">Dualstack Page</a>
+      <a href="https://v6.ipv6test.app/" class="nav-button" rel="noopener">IPv6-Only Page</a>
+      <a href="https://v4.ipv6test.app/" class="nav-button" rel="noopener">IPv4-Only Page</a>
     </div>
     <div id="emoji" class="text-8xl h-64 flex items-center justify-center"></div>
     <div class="text-center text-2xl py-5">
@@ -43,9 +43,9 @@
       </div>
     </div>
     <div id="wall-of-text">
-      {{- if eq $hostName "v4.mechapower.com" -}}
+      {{- if eq $hostName "v4.ipv6test.app" -}}
       {{- include "/markdown/ipv4.md" | markdown | wrap 80 | nindent 6 }}
-      {{- else if eq $hostName "v6.mechapower.com" -}}
+      {{- else if eq $hostName "v6.ipv6test.app" -}}
       {{include "/markdown/ipv6.md" | markdown | wrap 80 | nindent 6 }}
       {{- else -}}
       {{include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 6 }}
