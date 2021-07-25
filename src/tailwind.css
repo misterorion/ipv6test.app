@@ -51,7 +51,7 @@ body {
   @apply pt-2 pb-3 text-center font-bold align-middle;
 }
 #ip {
-  @apply text-center py-5 text-xs md:text-xl lg:text-3xl monospace;
+  @apply text-center py-5 text-xs md:text-xl lg:text-3xl text-black monospace;
 }
 h3 {
   @apply text-center text-2xl font-bold py-5;
