@@ -8,10 +8,14 @@ module.exports = {
     ],
     options: {
       safelist: [
-        'border-pink',
         'bg-pink',
-        'border-blue',
-        'bg-blue'
+        'border-pink',
+        'bg-purple',
+        'border-purple',
+        'bg-yellow',
+        'border-yellow',
+        'text-black',
+        'text-white'
       ]
     }
   },
