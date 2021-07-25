@@ -18,10 +18,5 @@ module.exports = {
         'text-white'
       ]
     }
-  },
-  variants: {
-    extend: {
-      margin: ['first'],
-    }
-  },
+  }
 }
