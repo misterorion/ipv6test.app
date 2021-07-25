@@ -7,7 +7,8 @@
 
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Test your IPv6 connectivity against a dualstack load balancer.">
+
+  <!-- Primary Meta Tags -->
   {{- if eq $hostName "v4.ipv6test.app" }}
   <title>IPv4-Only Test Page</title>
   {{- else if eq $hostName "v6.ipv6test.app" }}
@@ -15,6 +16,23 @@
   {{- else}}
   <title>Dualstack IPv6/IPv4 Test Page</title>
   {{ end -}}
+  <meta name="title" content="Dualstack IPv6/IPv4 Test Page">
+  <meta name="description" content="Test your IPv6 connectivity against a dualstack load balancer.">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="IPv6 Test Page">
+  <meta property="og:author" content="Orion Anderson">
+  <meta property="og:description" content="Is your network ready for IPvv6? Test your IPv6 connectivity against a dualstack load balancer with both A/AAAA records.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://ipv6test.app/assets/card.png">
+
+  <!-- Twitter -->
+  <meta property="twitter:title" content="IPv6 Test Page">
+  <meta property="twitter:creator" content="@misterorion">
+  <meta property="twitter:description" content="Is your network ready for IPvv6? Test your IPv6 connectivity against a dualstack load balancer with both A/AAAA records.">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:image" content="https://ipv6test.app/assets/card.png">
+
   <link rel="stylesheet" type="text/css" href="/assets/styles.min.css">
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
@@ -27,18 +45,6 @@
   {{- else }}
   <link rel="canonical" href="https://ipv6test.app">
   {{ end }}
-  <meta name="twitter:title" content="IPv6 Test Page">
-  <meta name="twitter:creator" content="@misterorion">
-  <meta name="twitter:description" content="Is your network ready for IPvv6? Test your IPv6 connectivity against a dualstack load balancer with both A/AAAA records.">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://ipv6test.app/assets/card.png">
-
-  <meta name="title" property="og:title" content="IPv6 Test Page">
-  <meta name="author" property="og:author" content="Orion Anderson">
-  <meta name="description" property="og:description" content="Is your network ready for IPvv6? Test your IPv6 connectivity against a dualstack load balancer with both A/AAAA records.">
-  <meta name="type" property="og:type" content="website">
-  <meta name="image" property="og:image" content="https://ipv6test.app/assets/card.png">
-  <meta name="publish_date" property="og:publish_date" content="Sun 25 Jul 2021 04:41:36 PM EDT">
 </head>
 
 <body>
