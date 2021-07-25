@@ -26,14 +26,32 @@ body {
 	-moz-osx-font-smoothing: antialiased;
 	font-smoothing: antialiased;
 }
+.monospace {
+  font-family: "Cascadia", "Courier New", Courier, monospace;
+}
+.main {
+  @apply mx-2 md:mx-auto md:max-w-2xl lg:max-w-4xl py-5 px-4 md:px-20 bg-white my-4 border-4 rounded-xl;
+}
+.nav {
+  @apply flex py-5 justify-center space-x-4 font-bold text-center sticky top-0 bg-white bg-opacity-75;
+}
 .nav-button {
   @apply w-1/3 py-3 rounded-xl bg-gray-100 hover:bg-purple-100 border-2 border-purple-400;
 }
+#emoji {
+  @apply text-8xl h-64 flex items-center justify-center;
+}
+#ip-report-title {
+  @apply pt-2 pb-3 text-center text-white font-bold align-middle;
+}
+#ip {
+  @apply text-center py-5 text-xs md:text-xl lg:text-3xl monospace;
+}
+h3 {
+  @apply text-center text-2xl font-bold py-5;
+}
 p {
   @apply font-normal mb-4 text-base md:text-lg;
-}
-.monospace {
-  font-family: "Cascadia", "Courier New", Courier, monospace;
 }
 .cmd-container {
   @apply border-4 border-gray-300 rounded-xl p-0 mb-8;
@@ -43,5 +61,14 @@ p {
 }
 .cmd-container__cmd {
   @apply font-semibold text-center py-2 monospace text-base md:text-2xl;
+}
+footer {
+  @apply text-sm text-center border-t border-gray-200 pt-5 mt-2;
+}
+footer a,img {
+  @apply inline-block;
+}
+.icon {
+  @apply mx-auto mt-5 mb-3 px-2;
 }
 @tailwind utilities;

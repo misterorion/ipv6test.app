@@ -23,22 +23,20 @@
 </head>
 
 <body>
-  <div class="mx-2 md:mx-auto md:max-w-2xl lg:max-w-4xl py-5 px-4 md:px-20 bg-white my-4 border-4 rounded-xl">
-    <div class="flex py-5 justify-center space-x-4 font-bold text-center sticky top-0 bg-white bg-opacity-75">
+  <div class="main">
+    <div class="nav">
       <a href="https://ipv6test.app/" class="nav-button">Dualstack Page</a>
       <a href="https://v6.ipv6test.app/" class="nav-button">IPv6-Only Page</a>
       <a href="https://v4.ipv6test.app/" class="nav-button">IPv4-Only Page</a>
     </div>
-    <div id="emoji" class="text-8xl h-64 flex items-center justify-center"></div>
-    <div class="text-center text-2xl font-bold py-5">
-      <h3 id="message"></h3>
-    </div>
+    <div id="emoji"></div>
+    <h3 id="message"></h3>
     <div id="ip-report" class="border-4 rounded-xl p-0 mb-8">
-      <div id="ip-report-title" class="pt-2 pb-3 text-center text-white font-bold align-middle">
+      <div id="ip-report-title">
         Your IP Address
       </div>
-      <div id="ip" class="text-center py-5 text-xs md:text-xl lg:text-3xl monospace">
-        {{ $ip }} 2603:7000:e300:e925:9002:2ddb:462b:5149
+      <div id="ip">
+        {{ $ip }}
       </div>
     </div>
     <div id="wall-of-text">
@@ -50,9 +48,7 @@
       {{ include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 6 }}
       {{- end }}
     </div>
-    <h3 class="text-center text-2xl font-bold py-5">
-      Get your IP from the command line!
-    </h3>
+    <h3>Get your IP from the command line!</h3>
     <div class="cmd-container">
       <div class="cmd-container__title">
         cURL
@@ -85,8 +81,16 @@
         http://{{ $hostName }}/ip
       </div>
     </div>
-    <footer class="text-center text-sm border-t border-gray-200 py-5 mt-2">
-      Page generated on: {{ $now }}
+    <footer>
+      <div>
+        Page generated on: {{ $now }}
+      </div>
+      <a class="icon" href="https://github.com/misterorion/ipv6test">
+        <img src="/assets/github.svg" alt="github" width="46">
+      </a>
+      <a class="icon" href="mailto:tech-admin@mechapower.com">
+        <img src="/assets/email.svg" alt="email" width="46">
+      </a>
     </footer>
   </div>
   <script src="/assets/scripts.min.js"></script>
