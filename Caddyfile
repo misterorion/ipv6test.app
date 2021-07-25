@@ -40,7 +40,7 @@ handle {
             X-XSS-Protection            "1; mode=block"
         }
         header /assets/* {
-            Cache-Control  "public,max-age=3600"
+            Cache-Control  "public,max-age=31557600"
         }
     }
 }
