@@ -5,11 +5,11 @@ if (ipAddr.includes(":")) {
     document
         .getElementById("ip-report")
         .classList
-        .add("border-green-700")
+        .add("border-blue")
     document
         .getElementById("ip-report-title")
         .classList
-        .add("bg-green-700")
+        .add("bg-blue")
     document
         .getElementById("emoji")
         .innerHTML = "😸"
@@ -21,11 +21,11 @@ if (ipAddr.includes(":")) {
     document
         .getElementById("ip-report")
         .classList
-        .add("border-red-700")
+        .add("border-pink")
     document
         .getElementById("ip-report-title")
         .classList
-        .add("bg-red-700")
+        .add("bg-pink")
     document
         .getElementById("emoji")
         .innerHTML = "😿"
