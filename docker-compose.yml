@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  ipv6test:
+    image: caddy:latest
+    ports:
+      - 8081:80
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./srv:/usr/share/caddy
