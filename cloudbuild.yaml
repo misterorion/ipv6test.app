@@ -55,6 +55,7 @@ steps:
     - '--image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT'
     - '--region=$_DEPLOY_REGION'
     - '--quiet'
+    - '--async'
 # Save the Node cache
 - name: gcr.io/cloud-builders/gcloud
   id: 'Save cache'
