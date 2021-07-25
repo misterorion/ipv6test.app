@@ -30,7 +30,7 @@
       <a href="https://v4.ipv6test.app/" class="nav-button">IPv4-Only Page</a>
     </div>
     <div id="emoji" class="text-8xl h-64 flex items-center justify-center"></div>
-    <div class="text-center text-2xl py-5">
+    <div class="text-center text-2xl font-bold py-5">
       <h3 id="message"></h3>
     </div>
     <div id="ip-report" class="border-4 rounded-xl p-0 mb-8">
@@ -50,7 +50,9 @@
       {{ include "/markdown/dualstack.md" | markdown | wrap 80 | nindent 6 }}
       {{- end }}
     </div>
-    <h3 class="text-center text-2xl py-5">Get your IP from the command line!</h3>
+    <h3 class="text-center text-2xl font-bold py-5">
+      Get your IP from the command line!
+    </h3>
     <div class="cmd-container">
       <div class="cmd-container__title">
         cURL
