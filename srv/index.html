@@ -24,7 +24,7 @@
   <link rel="canonical" href="https://v4.ipv6test.app">
   {{- else if eq $hostName "v6.ipv6test.app" }}
   <link rel="canonical" href="https://v6.ipv6test.app">
-  {{- else}}
+  {{- else }}
   <link rel="canonical" href="https://ipv6test.app">
   {{ end -}}
   <meta name="twitter:card" content="summary">
@@ -48,7 +48,7 @@
       <a href="https://ipv6test.app/">Dualstack Page</a>
       <a href="https://v6.ipv6test.app/" class="btn-active">IPv6-Only Page</a>
       <a href="https://v4.ipv6test.app/">IPv4-Only Page</a>
-      {{- else}}
+      {{- else }}
       <a href="https://ipv6test.app/" class="btn-active">Dualstack Page</a>
       <a href="https://v6.ipv6test.app/">IPv6-Only Page</a>
       <a href="https://v4.ipv6test.app/">IPv4-Only Page</a>
@@ -62,7 +62,7 @@
           Your IP Address
         </div>
         <div id="ip">
-          {{$ip}}
+          {{ $ip }}
         </div>
       </div>
       <div id="wall-of-text">
@@ -82,7 +82,7 @@
           cURL
         </div>
         <div class="cmd-container__cmd">
-          curl {{$hostName}}
+          curl {{ $hostName }}
         </div>
       </div>
       <div class="cmd-container">
@@ -90,7 +90,7 @@
           HTTPie
         </div>
         <div class="cmd-container__cmd">
-          http -b {{$hostName}}
+          http -b {{ $hostName }}
         </div>
       </div>
       <div class="cmd-container">
@@ -98,7 +98,7 @@
           Wget
         </div>
         <div class="cmd-container__cmd">
-          wget -qO- {{$hostName}}
+          wget -qO- {{ $hostName }}
         </div>
       </div>
       <div class="cmd-container">
@@ -106,13 +106,13 @@
           Plain output (any User-Agent)
         </div>
         <div class="cmd-container__cmd">
-          http://{{$hostName}}/ip
+          http://{{ $hostName }}/ip
         </div>
       </div>
     </section>
     <footer>
       <div>
-        Page generated on: {{$now}}
+        Page generated on: {{ $now }}
       </div>
       <a class="icon" href="https://github.com/misterorion/ipv6test">
         <img src="/assets/github.svg" alt="github" width="46">
