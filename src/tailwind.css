@@ -22,9 +22,6 @@ body {
   background: url("./bg.svg");
   @apply bg-center bg-no-repeat bg-cover bg-fixed;
   font-family: "Noto Sans", sans-serif;
-  -webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: antialiased;
-	font-smoothing: antialiased;
 }
 .monospace {
   font-family: "Cascadia", "Courier New", Courier, monospace;
