@@ -27,7 +27,7 @@ body {
   font-family: "Cascadia", "Courier New", Courier, monospace;
 }
 .main {
-  @apply mx-2 md:mx-auto md:max-w-2xl lg:max-w-4xl pt-2 sm:py-6 px-4 md:px-20 bg-white my-4 border-4 rounded-xl;
+  @apply mx-2 md:mx-auto md:max-w-2xl lg:max-w-4xl pt-2 pb-6 sm:py-6 px-4 md:px-20 bg-white my-4 border-4 rounded-xl;
 }
 .logo {
   @apply block w-1/2 md:w-1/3 lg:max-w-2xl mx-auto;
