@@ -2,8 +2,9 @@
 @tailwind components;
 @font-face {
   font-family: "Cascadia";
-  src: url("./Cascadia-Code.woff2");
+  src: url("./CascadiaCode-SemiBold.woff2");
   font-display: block;
+  font-weight: 600;
 }
 @font-face {
   font-family: "Noto Sans";
@@ -21,12 +22,15 @@ body {
   background: url("./bg.svg");
   @apply bg-center bg-no-repeat bg-cover bg-fixed;
   font-family: "Noto Sans", sans-serif;
+  -webkit-font-smoothing: subpixel-antialiased;
+	-moz-osx-font-smoothing: subpixel-antialiased;
+	font-smoothing: subpixel-antialiased;
 }
 .nav-button {
   @apply w-1/3 py-3 rounded-xl bg-gray-100 hover:bg-purple-100 border-2 border-purple-400;
 }
 p {
-  @apply mb-4 text-base md:text-lg;
+  @apply font-normal mb-4 text-base md:text-lg;
 }
 .monospace {
   font-family: "Cascadia", "Courier New", Courier, monospace;
@@ -35,9 +39,9 @@ p {
   @apply border-4 border-gray-300 rounded-xl p-0 mb-8;
 }
 .cmd-container__title {
-  @apply bg-gray-300 font-bold text-center pt-1 pb-2 align-middle;
+  @apply font-semibold bg-gray-300 text-center pt-1 pb-2 align-middle;
 }
 .cmd-container__cmd {
-  @apply text-center py-2 monospace text-base md:text-2xl;
+  @apply font-semibold text-center py-2 monospace text-base md:text-2xl;
 }
 @tailwind utilities;
