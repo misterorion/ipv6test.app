@@ -43,7 +43,7 @@ steps:
   id: 'Push Caddy image'
   args: ['push', '$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT']
 # Update Cloud Run service
-- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+- name: gcr.io/cloud-builders/gcloud
   id: 'Update Cloud Run service'
   entrypoint: gcloud
   args:
