@@ -42,7 +42,7 @@ body {
   @apply bg-purple-200;
 }
 #emoji {
-  @apply text-8xl h-64 flex items-center justify-center;
+  @apply text-8xl h-32 md:h-64 flex items-center justify-center;
 }
 #ip-report {
   @apply border-4 rounded-xl p-0 mb-8;
