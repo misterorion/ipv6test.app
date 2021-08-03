@@ -1,10 +1,10 @@
 steps:
 # If a cache exists, fetch it from Cloud Storage
 - name: gcr.io/cloud-builders/gcloud
-  id: 'Fetch cache'
+  id: Fetch cache
   entrypoint: sh
   args:
-    - '-c'
+    - -c
     - |
       (
         set -e
@@ -16,52 +16,55 @@ steps:
       ) || true
 # Install Node dependencies
 - name: $_BUILDERS_REPO/$_NODE_IMAGE
-  id: 'Yarn install'
+  id: Yarn install
   entrypoint: sh
   args:
-    - '-c'
+    - -c
     - |
       test -f cache.tar.gz || yarn install
 # Build CSS and JS
 - name: $_BUILDERS_REPO/$_NODE_IMAGE
-  id: 'Yarn build'
+  id: Yarn build
   entrypoint: yarn
-  args: ['build']
+  args: 
+    - build
 # Build the Caddy Docker image
 - name: gcr.io/cloud-builders/docker
-  id: 'Build Caddy image'
+  id: Build Caddy image
   args:
     - build
-    - '--build-arg'
-    - 'caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE'
-    - '-t'
-    - '$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT'
-    - '--no-cache'
+    - --build-arg
+    - caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE
+    - -t
+    - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
+    - --no-cache
     - .
 # Push the Caddy Docker iamge
 - name: gcr.io/cloud-builders/docker
-  id: 'Push Caddy image'
-  args: ['push', '$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT']
+  id: Push Caddy image
+  args: 
+    - push
+    - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
 # Update Cloud Run service
 - name: gcr.io/cloud-builders/gcloud
-  id: 'Update Cloud Run service'
+  id: Update Cloud Run service
   entrypoint: gcloud
   args:
     - run
     - services
     - update
     - $_SERVICE_NAME
-    - '--platform=managed'
-    - '--image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT'
-    - '--region=$_DEPLOY_REGION'
-    - '--quiet'
-    - '--async'
+    - --platform=managed
+    - --image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
+    - --region=$_DEPLOY_REGION
+    - --quiet
+    - --async
 # Save the Node cache
 - name: gcr.io/cloud-builders/gcloud
-  id: 'Save cache'
+  id: Save cache
   entrypoint: sh
   args:
-    - '-c'
+    - -c
     - |
       (
         set -e
