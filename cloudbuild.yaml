@@ -1,74 +1,74 @@
 steps:
-# If a cache exists, fetch it from Cloud Storage
-- name: gcr.io/cloud-builders/gcloud
-  id: Fetch cache
-  entrypoint: sh
-  args:
-    - -c
-    - |
-      (
-        set -e
-        gsutil hash -h yarn.lock | grep md5 | tr -s " " | awk '{print $3}' > hashed.yarn-lock
-        gsutil -m cp "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)" cache.tar.gz 2> /dev/null
-        test -f cache.tar.gz
-        tar -zxf cache.tar.gz
-        echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
-      ) || true
-# Install Node dependencies
-- name: $_BUILDERS_REPO/$_NODE_IMAGE
-  id: Yarn install
-  entrypoint: sh
-  args:
-    - -c
-    - |
-      test -f cache.tar.gz || yarn install
-# Build CSS and JS
-- name: $_BUILDERS_REPO/$_NODE_IMAGE
-  id: Yarn build
-  entrypoint: yarn
-  args: 
-    - build
-# Build the Caddy Docker image
-- name: gcr.io/cloud-builders/docker
-  id: Build Caddy image
-  args:
-    - build
-    - --build-arg
-    - caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE
-    - -t
-    - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-    - --no-cache
-    - .
-# Push the Caddy Docker iamge
-- name: gcr.io/cloud-builders/docker
-  id: Push Caddy image
-  args: 
-    - push
-    - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-# Update Cloud Run service
-- name: gcr.io/cloud-builders/gcloud
-  id: Update Cloud Run service
-  entrypoint: gcloud
-  args:
-    - run
-    - services
-    - update
-    - $_SERVICE_NAME
-    - --platform=managed
-    - --image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-    - --region=$_DEPLOY_REGION
-    - --quiet
-    - --async
-# Save the Node cache
-- name: gcr.io/cloud-builders/gcloud
-  id: Save cache
-  entrypoint: sh
-  args:
-    - -c
-    - |
-      (
-        set -e
-        test ! -f cache.tar.gz
-        tar -zcf cache.tar.gz node_modules
-        gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
-      ) || true
+  # If a cache exists, fetch it from Cloud Storage
+  - name: gcr.io/cloud-builders/gcloud
+    id: Fetch cache
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        (
+          set -e
+          gsutil hash -h yarn.lock | grep md5 | tr -s " " | awk '{print $3}' > hashed.yarn-lock
+          gsutil -m cp "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)" cache.tar.gz 2> /dev/null
+          test -f cache.tar.gz
+          tar -zxf cache.tar.gz
+          echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
+        ) || true
+  # Install Node dependencies
+  - name: $_BUILDERS_REPO/$_NODE_IMAGE
+    id: Yarn install
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        test -f cache.tar.gz || yarn install
+  # Build CSS and JS
+  - name: $_BUILDERS_REPO/$_NODE_IMAGE
+    id: Yarn build
+    entrypoint: yarn
+    args: 
+      - build
+  # Build the Caddy Docker image
+  - name: gcr.io/cloud-builders/docker
+    id: Build Caddy image
+    args:
+      - build
+      - --build-arg
+      - caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE
+      - -t
+      - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
+      - --no-cache
+      - .
+  # Push the Caddy Docker iamge
+  - name: gcr.io/cloud-builders/docker
+    id: Push Caddy image
+    args: 
+      - push
+      - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
+  # Update Cloud Run service
+  - name: gcr.io/cloud-builders/gcloud
+    id: Update Cloud Run service
+    entrypoint: gcloud
+    args:
+      - run
+      - services
+      - update
+      - $_SERVICE_NAME
+      - --platform=managed
+      - --image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
+      - --region=$_DEPLOY_REGION
+      - --quiet
+      - --async
+  # Save the Node cache
+  - name: gcr.io/cloud-builders/gcloud
+    id: Save cache
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        (
+          set -e
+          test ! -f cache.tar.gz
+          tar -zcf cache.tar.gz node_modules
+          gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
+        ) || true
