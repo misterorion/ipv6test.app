@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipv6test-app
+  namespace: default
+  labels:
+    app: ipv6test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ipv6test-app
+  template:
+    metadata:
+      labels:
+        app: ipv6test-app
+    spec:
+      containers:
+      - name: ipv6test-app
+        image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test:production
+        resources:
+          limits:
+            cpu: 50m
+            memory: 32Mi
+          requests:
+            cpu: 10m
+            memory: 6Mi
+        readinessProbe:
+          httpGet:
+            path: /robots.txt
+            port: 80
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        livenessProbe:
+          httpGet:
+            path: /robots.txt
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 15

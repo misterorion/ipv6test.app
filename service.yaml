@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ipv6test-app
+  annotations:
+    cloud.google.com/neg: '{"exposed_ports": {"80": {"name": "ipv6test-app-4azzo6t"}}}'
+spec:
+  type: ClusterIP
+  selector:
+    app: ipv6test-app
+  ports:
+    - name: caddy
+      protocol: TCP
+      port: 80
+      targetPort: 80
