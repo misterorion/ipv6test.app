@@ -15,50 +15,56 @@ steps:
           echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
   # Install Node dependencies
-  - name: $_BUILDERS_REPO/$_NODE_IMAGE
+  - name: $_NODE_IMAGE
     id: Yarn install
     entrypoint: sh
     args:
       - -c
       - |
         test -f cache.tar.gz || yarn install
-  # Build CSS and JS
-  - name: $_BUILDERS_REPO/$_NODE_IMAGE
-    id: Yarn build
-    entrypoint: yarn
-    args: 
-      - build
+        yarn build
   # Build the Caddy Docker image
   - name: gcr.io/cloud-builders/docker
-    id: Build Caddy image
+    id: Tag and push image
+    entrypoint: sh
     args:
-      - build
-      - --build-arg
-      - caddy_image=$_BUILDERS_REPO/$_CADDY_IMAGE
-      - -t
-      - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-      - --no-cache
-      - .
-  # Push the Caddy Docker iamge
-  - name: gcr.io/cloud-builders/docker
-    id: Push Caddy image
-    args: 
-      - push
-      - $_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-  # Update Cloud Run service
-  - name: gcr.io/cloud-builders/gcloud
-    id: Update Cloud Run service
-    entrypoint: gcloud
+      - -c
+      - |
+        docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
+        docker push $_APP_IMAGE:$SHORT_SHA
+  - id: Authorize Cloud Build instance
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        gcloud container clusters update $_CLUSTER \
+          --zone $_ZONE \
+          --enable-master-authorized-networks \
+          --master-authorized-networks $(curl -s v4.ipv6test.app)/32,$_HOME_IP/32 \
+          --no-user-output-enabled \
+          --verbosity error
+    waitFor: ["-"]
+  - name: gcr.io/cloud-builders/gke-deploy
+    id: Deploy to GKE
     args:
       - run
-      - services
-      - update
-      - $_SERVICE_NAME
-      - --platform=managed
-      - --image=$_APP_REPO/$_SERVICE_NAME:$_ENVIRONMENT
-      - --region=$_DEPLOY_REGION
-      - --quiet
-      - --async
+      - --filename=deployment.yaml
+      - --image=$_APP_IMAGE:$SHORT_SHA
+      - --location=$_ZONE
+      - --cluster=$_CLUSTER
+  - id: Deauthorize Cloud Build instance
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: sh
+    args:
+      - -c
+      - |
+        gcloud container clusters update $_CLUSTER \
+          --zone $_ZONE \
+          --enable-master-authorized-networks \
+          --master-authorized-networks $_HOME_IP/32 \
+          --no-user-output-enabled \
+          --verbosity error
   # Save the Node cache
   - name: gcr.io/cloud-builders/gcloud
     id: Save cache
@@ -72,3 +78,5 @@ steps:
           tar -zcf cache.tar.gz node_modules
           gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
+    waitFor:
+      - Tag and push image
