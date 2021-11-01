@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: ipv6test-app
-        image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test:production
+        image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test
         resources:
           limits:
             cpu: 50m
