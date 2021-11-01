@@ -20,7 +20,6 @@ spec:
         image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test
         resources:
           limits:
-            cpu: 50m
             memory: 32Mi
           requests:
             cpu: 10m
