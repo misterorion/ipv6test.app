@@ -8,11 +8,11 @@
     "build": "npm run minifyJS && npm run buildCSS"
   },
   "devDependencies": {
-    "autoprefixer": "^10.3.1",
-    "cssnano": "^5.0.7",
-    "postcss": "^8.3.6",
-    "postcss-cli": "^8.3.1",
-    "tailwindcss": "^2.2.7",
-    "uglify-js": "^3.14.0"
+    "autoprefixer": "^10.4.0",
+    "cssnano": "^5.0.8",
+    "postcss": "^8.3.11",
+    "postcss-cli": "^9.0.1",
+    "tailwindcss": "^2.2.19",
+    "uglify-js": "^3.14.2"
   }
 }
