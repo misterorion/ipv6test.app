@@ -1,5 +1,4 @@
 steps:
-  # If a cache exists, fetch it from Cloud Storage
   - name: gcr.io/cloud-builders/gcloud
     id: Fetch cache
     entrypoint: sh
@@ -14,7 +13,6 @@ steps:
           tar -zxf cache.tar.gz
           echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
-  # Install Node dependencies
   - name: $_NODE_IMAGE
     id: Yarn install
     entrypoint: sh
@@ -23,7 +21,6 @@ steps:
       - |
         test -f cache.tar.gz || yarn install
         yarn build
-  # Build the Caddy Docker image
   - name: gcr.io/cloud-builders/docker
     id: Tag and push image
     entrypoint: sh
@@ -40,7 +37,6 @@ steps:
       - --image=$_APP_IMAGE:$SHORT_SHA
       - --location=$_ZONE
       - --cluster=$_CLUSTER
-  # Save the Node cache
   - name: gcr.io/cloud-builders/gcloud
     id: Save cache
     entrypoint: sh
@@ -54,4 +50,4 @@ steps:
           gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
     waitFor:
-      - Tag and push image
+      - Yarn build
