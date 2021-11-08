@@ -14,7 +14,7 @@ steps:
           echo "Using cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
   - name: $_NODE_IMAGE
-    id: Yarn install
+    id: Yarn build
     entrypoint: sh
     args:
       - -c
