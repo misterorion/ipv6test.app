@@ -15,14 +15,16 @@ spec:
       labels:
         app: ipv6test-app
     spec:
+      nodeSelector:
+        cloud.google.com/gke-spot: "true"
       containers:
       - name: ipv6test-app
-        image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test
+        image: us-central1-docker.pkg.dev/mechapower/apps/ipv6test:e5b6741
         resources:
           limits:
-            memory: 32Mi
+            memory: 24Mi
           requests:
-            cpu: 10m
+            cpu: 5m
             memory: 6Mi
         readinessProbe:
           httpGet:
