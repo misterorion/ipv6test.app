@@ -29,14 +29,6 @@ steps:
       - |
         docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
         docker push $_APP_IMAGE:$SHORT_SHA
-  - name: gcr.io/cloud-builders/gke-deploy
-    id: Deploy to GKE
-    args:
-      - run
-      - --filename=deployment.yaml
-      - --image=$_APP_IMAGE:$SHORT_SHA
-      - --location=$_ZONE
-      - --cluster=$_CLUSTER
   - name: gcr.io/cloud-builders/gcloud
     id: Save cache
     entrypoint: sh
