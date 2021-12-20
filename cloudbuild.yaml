@@ -29,8 +29,45 @@ steps:
       - |
         docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
         docker push $_APP_IMAGE:$SHORT_SHA
-  - name: gcr.io/cloud-builders/gcloud
-    id: Save cache
+  - id: Prep SSH
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "$$SECRET_KEY" >> /root/.ssh/id_rsa
+        chmod 400 /root/.ssh/id_rsa
+        ssh-keyscan -t rsa github.com > known_hosts.github
+        cp known_hosts.github /root/.ssh/known_hosts
+    secretEnv:
+      - SECRET_KEY
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+  - id: Update manifests
+    name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        (
+          set -e
+          AUTHOR_NAME=$$(git log -1 --pretty=format:"%an")
+          AUTHOR_EMAIL=$$(git log -1 --pretty=format:"%ae")
+          LAST_COMMIT_MESSAGE=$$(git log --format=%B -n 1 $SHORT_SHA)
+          mkdir tmp && git clone $_CONFIG_REPO tmp && cd tmp && \
+          sed "s/COMMIT_SHA/$SHORT_SHA/g" prod/deployment.yaml.tpl > prod/deployment.yaml && \
+          git add prod/deployment.yaml && \
+          git config user.name "$$AUTHOR_NAME" && \
+          git config user.email "$$AUTHOR_EMAIL" && \
+          git commit -m "$$LAST_COMMIT_MESSAGE" && \
+          git push origin main
+        ) || true
+    volumes:
+      - name: ssh
+        path: /root/.ssh
+  - id: Cache node_modules
+    name: gcr.io/cloud-builders/gcloud
     entrypoint: sh
     args:
       - -c
@@ -38,8 +75,12 @@ steps:
         (
           set -e
           test ! -f cache.tar.gz
-          tar -zcf cache.tar.gz node_modules
+          tar -zcf cache.tar.gz node_modules public .cache
           gsutil -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
         ) || true
     waitFor:
       - Yarn build
+availableSecrets:
+  secretManager:
+    - versionName: projects/$_PROJECT/secrets/$_SECRET_KEY/versions/latest
+      env: SECRET_KEY
