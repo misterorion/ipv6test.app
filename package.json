@@ -2,19 +2,20 @@
   "name": "ipv6test",
   "author": "Orion Anderson <orion@mechapower.com>",
   "license": "MIT",
+  "packageManager": "yarn@3.1.1",
   "scripts": {
     "minifyJS": "uglifyjs src/confetti.js src/report.js -c -m -o srv/assets/scripts.min.js",
     "buildCSS": "postcss src/tailwind.css -o srv/assets/styles.min.css",
-    "build": "npm run minifyJS && npm run buildCSS",
-    "reset": "shx rm yarn.lock && shx rm -rf .\\node_modules\\ && yarn install"
+    "build": "yarn run minifyJS && npm run buildCSS",
+    "reset": "yarn run clean && shx rm yarn.lock && yarn cache clean && yarn install"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.0",
     "cssnano": "^5.0.13",
     "postcss": "^8.4.5",
     "postcss-cli": "^9.1.0",
+    "shx": "^0.3.3",
     "tailwindcss": "^3.0.7",
-    "uglify-js": "^3.14.5",
-    "shx": "^0.3.3"
+    "uglify-js": "^3.14.5"
   }
 }

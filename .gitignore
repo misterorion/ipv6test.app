@@ -1,3 +1,12 @@
 node_modules/
 srv/assets/scripts.min.js
 srv/assets/styles.min.css
+
+# Yarn 2 files
+.yarn/*
+!.yarn/cache
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
