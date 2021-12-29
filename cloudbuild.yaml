@@ -29,16 +29,14 @@ steps:
       - |
         docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
         docker push $_APP_IMAGE:$SHORT_SHA
-  - id: Prep SSH
+  - id: Prep SSH for GitHub
     name: gcr.io/cloud-builders/gcloud
     entrypoint: bash
     args:
       - -c
       - |
-        echo "$$SECRET_KEY" >> /root/.ssh/id_rsa
-        chmod 400 /root/.ssh/id_rsa
-        ssh-keyscan -t rsa github.com > known_hosts.github
-        cp known_hosts.github /root/.ssh/known_hosts
+        echo "$$SECRET_KEY" >> /root/.ssh/id_ed25519 && chmod 400 /root/.ssh/id_ed25519
+        ssh-keyscan -p 2022 source.developers.google.com > /root/.ssh/known_hosts
     secretEnv:
       - SECRET_KEY
     volumes:
@@ -56,12 +54,12 @@ steps:
           AUTHOR_EMAIL=$$(git log -1 --pretty=format:"%ae")
           LAST_COMMIT_MESSAGE=$$(git log --format=%B -n 1 $SHORT_SHA)
           mkdir tmp && git clone $_CONFIG_REPO tmp && cd tmp && \
-          sed "s/COMMIT_SHA/$SHORT_SHA/g" prod/deployment.yaml.tpl > prod/deployment.yaml && \
-          git add prod/deployment.yaml && \
+          sed "s/COMMIT_SHA/$SHORT_SHA/g" master/deployment.yaml.tpl > master/deployment.yaml && \
+          git add master/deployment.yaml && \
           git config user.name "$$AUTHOR_NAME" && \
           git config user.email "$$AUTHOR_EMAIL" && \
           git commit -m "$$LAST_COMMIT_MESSAGE" && \
-          git push origin main
+          git push origin master
         ) || true
     volumes:
       - name: ssh
