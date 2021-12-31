@@ -29,41 +29,29 @@ steps:
       - |
         docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
         docker push $_APP_IMAGE:$SHORT_SHA
-  - id: Prep SSH for GitHub
+  - id: Update manifest
     name: gcr.io/cloud-builders/gcloud
     entrypoint: bash
     args:
       - -c
       - |
+        mkdir -p /root/.ssh
         echo "$$SECRET_KEY" >> /root/.ssh/id_ed25519 && chmod 400 /root/.ssh/id_ed25519
         ssh-keyscan -p 2022 source.developers.google.com > /root/.ssh/known_hosts
+        AUTHOR_NAME=$$(git log -1 --pretty=format:"%an")
+        AUTHOR_EMAIL=$$(git log -1 --pretty=format:"%ae")
+        LAST_COMMIT_MESSAGE=$$(git log --format=%B -n 1 $SHORT_SHA)
+        git clone $_CONFIG_REPO tmp && cd tmp && \
+        gsutil -q -m cp $_HELM_BIN helm.tar.gz && tar -zxf helm.tar.gz && \
+        ./helm template --set caddy-secure.shortSHA=$SHORT_SHA app \
+            -f app/values-prod.yaml > state/prod/state.yaml && \
+        git add state/prod/state.yaml && \
+        git config user.name "$$AUTHOR_NAME" && \
+        git config user.email "$$AUTHOR_EMAIL" && \
+        git commit -m "$$LAST_COMMIT_MESSAGE" && \
+        git push origin master || true
     secretEnv:
       - SECRET_KEY
-    volumes:
-      - name: ssh
-        path: /root/.ssh
-  - id: Update manifests
-    name: gcr.io/cloud-builders/gcloud
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        (
-          set -e
-          AUTHOR_NAME=$$(git log -1 --pretty=format:"%an")
-          AUTHOR_EMAIL=$$(git log -1 --pretty=format:"%ae")
-          LAST_COMMIT_MESSAGE=$$(git log --format=%B -n 1 $SHORT_SHA)
-          mkdir tmp && git clone $_CONFIG_REPO tmp && cd tmp && \
-          sed "s/COMMIT_SHA/$SHORT_SHA/g" master/deployment.yaml.tpl > master/deployment.yaml && \
-          git add master/deployment.yaml && \
-          git config user.name "$$AUTHOR_NAME" && \
-          git config user.email "$$AUTHOR_EMAIL" && \
-          git commit -m "$$LAST_COMMIT_MESSAGE" && \
-          git push origin master
-        ) || true
-    volumes:
-      - name: ssh
-        path: /root/.ssh
   - id: Push cache
     name: gcr.io/cloud-builders/gcloud
     entrypoint: bash

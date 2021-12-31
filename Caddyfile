@@ -1,49 +1,61 @@
 {
 	admin off
+	http_port 8080
+	auto_https off
 }
-:80
+:8080
 file_server
 templates
 root * /usr/share/caddy
 
 @encode_exts {
-    path / *.html *.js *.css *.svg
+	path / *.html *.js *.css *.svg
 }
 encode @encode_exts gzip
 
 respond /templates/* 404
 
 @cli {
-    header_regexp User-Agent (^curl|^[Ww]get|^HTTPie)
+	header_regexp User-Agent (^curl|^[Ww]get|^HTTPie)
 }
 
 handle @cli {
-    header Content-Type "text/plain; charset=UTF-8"
-    respond `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
+	header Content-Type "text/plain; charset=UTF-8"
+	respond ` {
+		first (.Req.Header.Get "X-Forwarded-For" | splitList ",")
+	}
+}
+
+`
 }
 
 handle /ip {
-    header {
-        Cache-Control               "no-store"
-        Content-Type                "text/plain; charset=UTF-8"
-    }
-    respond `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
+	header {
+		Cache-Control "no-store"
+		Content-Type "text/plain; charset=UTF-8"
+	}
+	respond ` {
+		first (.Req.Header.Get "X-Forwarded-For" | splitList ",")
+	}
+}
+
+`
 }
 
 handle {
-    route {
-        header {
-            Cache-Control               "no-store"
-            Content-Security-Policy     "script-src 'self'"
-            Permissions-Policy          "geolocation=()"
-            Referrer-Policy             "no-referrer"
-            Strict-Transport-Security   "max-age=63072000; includeSubDomains"
-            X-Content-Type-Options      "nosniff"
-            X-Frame-Options             "DENY"
-            X-XSS-Protection            "1; mode=block"
-        }
-        header /assets/* {
-            Cache-Control  "public,max-age=86400"
-        }
-    }
+	route {
+		header {
+			Cache-Control "no-store"
+			Content-Security-Policy "script-src 'self'"
+			Permissions-Policy "geolocation=()"
+			Referrer-Policy "no-referrer"
+			Strict-Transport-Security "max-age=63072000; includeSubDomains"
+			X-Content-Type-Options "nosniff"
+			X-Frame-Options "DENY"
+			X-XSS-Protection "1; mode=block"
+		}
+		header /assets/* {
+			Cache-Control "public,max-age=86400"
+		}
+	}
 }
