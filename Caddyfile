@@ -21,12 +21,7 @@ respond /templates/* 404
 
 handle @cli {
 	header Content-Type "text/plain; charset=UTF-8"
-	respond ` {
-		first (.Req.Header.Get "X-Forwarded-For" | splitList ",")
-	}
-}
-
-`
+	respond `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
 }
 
 handle /ip {
@@ -34,12 +29,7 @@ handle /ip {
 		Cache-Control "no-store"
 		Content-Type "text/plain; charset=UTF-8"
 	}
-	respond ` {
-		first (.Req.Header.Get "X-Forwarded-For" | splitList ",")
-	}
-}
-
-`
+	respond `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
 }
 
 handle {
