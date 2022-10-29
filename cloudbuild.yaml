@@ -1,25 +1,11 @@
 steps:
-  - name: gcr.io/cloud-builders/gcloud
-    id: Fetch cache
-    entrypoint: sh
-    args:
-      - -c
-      - |
-        (
-          set -e
-          gsutil -q hash -h yarn.lock | grep md5 | tr -s " " | awk '{print $3}' > hashed.yarn-lock
-          echo "Attempting to use cache from: gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
-          gsutil -q -m cp "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)" cache.tar.gz 2> /dev/null
-          test -f cache.tar.gz
-          tar -zxf cache.tar.gz
-        ) || true
   - name: $_NODE_IMAGE
     id: Yarn build
     entrypoint: sh
     args:
       - -c
       - |
-        test -f cache.tar.gz || yarn install --immutable
+        yarn install --immutable
         yarn build
   - name: gcr.io/cloud-builders/docker
     id: Tag and push image
@@ -36,13 +22,3 @@ steps:
       - -c
       - |
         gcloud run deploy $_SERVICE --image $_APP_IMAGE:$SHORT_SHA --region us-central1
-  - id: Push cache
-    name: gcr.io/cloud-builders/gcloud
-    entrypoint: bash
-    args:
-      - -c
-      - |
-        tar -zcf cache.tar.gz .yarn/unplugged .cache public
-        gsutil -q -m cp cache.tar.gz "gs://$_CACHE_BUCKET/$(cat hashed.yarn-lock)"
-    waitFor:
-      - Yarn build
