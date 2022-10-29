@@ -38,10 +38,7 @@ http:// {
 	handle @cli {
 		templates
 		header Content-Type "text/plain; charset=UTF-8"
-		respond 200 {
-			body "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
-			close
-		}
+		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
 	}
 
 	handle /ip {
@@ -50,9 +47,6 @@ http:// {
 			Cache-Control "no-store"
 			Content-Type "text/plain; charset=UTF-8"
 		}
-		respond 200 {
-			body "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
-			close
-		}
+		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
 	}
 }
