@@ -8,7 +8,7 @@ http:// {
 	handle {
 		file_server
 		templates
-		root * /usr/share/caddy
+		root * /srv
 
 		@encode_exts {
 			path / *.html *.js *.css *.svg
@@ -37,10 +37,7 @@ http:// {
 	}
 	handle @cli {
 		header Content-Type "text/plain; charset=UTF-8"
-		respond {
-			body `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
-			close
-		}
+		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
 	}
 
 	handle /ip {
@@ -48,9 +45,6 @@ http:// {
 			Cache-Control "no-store"
 			Content-Type "text/plain; charset=UTF-8"
 		}
-		respond {
-			body `{{ first (.Req.Header.Get "X-Forwarded-For" | splitList ",") }}`
-			close
-		}
+		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
 	}
 }
