@@ -36,15 +36,23 @@ http:// {
 		header_regexp User-Agent (^curl|^[Ww]get|^HTTPie)
 	}
 	handle @cli {
+		templates
 		header Content-Type "text/plain; charset=UTF-8"
-		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
+		respond 200 {
+			body "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
+			close
+		}
 	}
 
 	handle /ip {
+		templates
 		header {
 			Cache-Control "no-store"
 			Content-Type "text/plain; charset=UTF-8"
 		}
-		respond "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
+		respond 200 {
+			body "{{ first (.Req.Header.Get \"X-Forwarded-For\" | splitList \",\") }}"
+			close
+		}
 	}
 }
