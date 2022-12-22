@@ -1,13 +1,13 @@
 steps:
   - name: $_NODE_IMAGE
-    id: Build
+    id: Build Site
     entrypoint: sh
     args:
       - -c
       - |
         npm ci && npm run build
   - name: gcr.io/cloud-builders/docker
-    id: Tag and push image
+    id: Build and push image
     entrypoint: sh
     args:
       - -c
