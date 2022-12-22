@@ -20,4 +20,4 @@ steps:
     args:
       - -c
       - |
-        gcloud run deploy $_SERVICE --image $_APP_IMAGE:$SHORT_SHA --region us-central1
+        gcloud run deploy $_SERVICE --image $_APP_IMAGE:$SHORT_SHA --async --region us-central1
