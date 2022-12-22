@@ -30,6 +30,7 @@ http:// {
 		@cache_one_week {
 			path /assets/*
 			path /robots.txt
+			path /favicon.ico
 		}
 		route {
 			header Cache-Control no-store
