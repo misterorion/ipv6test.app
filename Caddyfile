@@ -27,13 +27,13 @@ http:// {
 			X-XSS-Protection "1; mode=block"
 		}
 
-		@cache {
+		@cache_one_week {
 			path /assets/*
 			path /robots.txt
 		}
 		route {
-			header @cache Cache-Control public,max-age=604800
 			header Cache-Control no-store
+			header @cache_one_week Cache-Control public,max-age=604800
 		}
 	}
 
