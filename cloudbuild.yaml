@@ -1,12 +1,11 @@
 steps:
   - name: $_NODE_IMAGE
-    id: Yarn build
+    id: Build
     entrypoint: sh
     args:
       - -c
       - |
-        yarn install --immutable
-        yarn build
+        npm ci && npm run build
   - name: gcr.io/cloud-builders/docker
     id: Tag and push image
     entrypoint: sh
