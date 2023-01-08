@@ -34,7 +34,7 @@ http:// {
 		}
 		route {
 			header Cache-Control no-store
-			header @cache_one_week Cache-Control max-age=604800, must-revalidatae
+			header @cache_one_week Cache-Control "max-age=604800, must-revalidatae"
 		}
 	}
 
