@@ -1,7 +1,4 @@
 steps:
-  - id: Fetch Brotli Binary
-    name: gcr.io/cloud-builders/gcloud
-    args: ["storage", "cp", "$_BROTLI_BIN", "brotli.tar.gz"]
   - id: Build Container
     name: gcr.io/cloud-builders/docker
     args: ["build", "-t", "$_APP_IMAGE:$SHORT_SHA", "."]
