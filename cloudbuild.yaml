@@ -1,23 +1,21 @@
 steps:
-  - name: $_NODE_IMAGE
-    id: Build Site
-    entrypoint: sh
-    args:
-      - -c
-      - |
-        npm ci && npm run build
-  - name: gcr.io/cloud-builders/docker
-    id: Build and push image
-    entrypoint: sh
-    args:
-      - -c
-      - |
-        docker build --build-arg CADDY_IMAGE=$_CADDY_IMAGE -t $_APP_IMAGE:$SHORT_SHA .
-        docker push $_APP_IMAGE:$SHORT_SHA
+  - id: Fetch Brotli Binary
+    name: gcr.io/cloud-builders/gcloud
+    args: ["storage", "cp", "$_BROTLI_BIN", "brotli.tar.gz"]
+  - id: Build Container
+    name: gcr.io/cloud-builders/docker
+    args: ["build", "-t", "$_APP_IMAGE:$SHORT_SHA", "."]
+  - id: Push Container
+    name: gcr.io/cloud-builders/docker
+    args: ["push", "$_APP_IMAGE:$SHORT_SHA"]
   - id: Deploy to Cloud Run
     name: gcr.io/cloud-builders/gcloud
-    entrypoint: bash
     args:
-      - -c
-      - |
-        gcloud run deploy $_SERVICE --image $_APP_IMAGE:$SHORT_SHA --async --region us-central1
+      [
+        "run",
+        "deploy",
+        "$_SERVICE",
+        "--image=$_APP_IMAGE:$SHORT_SHA",
+        "--region=us-central1",
+        "--async",
+      ]
