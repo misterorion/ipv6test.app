@@ -6,9 +6,9 @@
 
 http:// {
 	handle {
+		root * /srv
 		file_server {
 			precompressed br gzip
-			root /srv
 		}
 		templates
 
