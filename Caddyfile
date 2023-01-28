@@ -7,11 +7,13 @@
 http:// {
 	handle {
 		root * /srv
-		file_server {
-			precompressed br gzip
-			root /srv
-		}
+		file_server
 		templates
+
+		@encode_exts {
+			path / *.html *.js *.css *.svg
+		}
+		encode @encode_exts gzip
 
 		respond /templates/* 404
 
