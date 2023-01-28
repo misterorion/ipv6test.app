@@ -6,14 +6,11 @@
 
 http:// {
 	handle {
-		file_server
-		templates
-		root * /srv
-
-		@encode_exts {
-			path / *.html *.js *.css *.svg
+		file_server {
+			precompressed br gzip
+			root /srv
 		}
-		encode @encode_exts gzip
+		templates
 
 		respond /templates/* 404
 
