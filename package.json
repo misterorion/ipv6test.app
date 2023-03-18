@@ -8,7 +8,7 @@
     "build": "npm run minifyJS && npm run buildCSS"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.13",
+    "autoprefixer": "^10.4.14",
     "cssnano": "^5.1.15",
     "postcss": "^8.4.21",
     "postcss-cli": "^10.1.0",
