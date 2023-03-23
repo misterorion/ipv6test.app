@@ -1,6 +1,7 @@
 steps:
   - id: Fetch Brotli Binary
-    name: gcr.io/cloud-builders/gcloud
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    entrypoint: gcloud
     args: ["storage", "cp", "$_BROTLI_BIN", "brotli.tar.gz"]
   - id: Build Container
     name: gcr.io/cloud-builders/docker
@@ -9,7 +10,8 @@ steps:
     name: gcr.io/cloud-builders/docker
     args: ["push", "$_APP_IMAGE:$SHORT_SHA"]
   - id: Deploy to Cloud Run
-    name: gcr.io/cloud-builders/gcloud
+    name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+    entrypoint: gcloud
     args:
       [
         "run",
