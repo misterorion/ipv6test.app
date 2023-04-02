@@ -13,6 +13,6 @@ RUN tar -zxf brotli.tar.gz && \
     -exec ./brotli --best {} \+ \
     -exec gzip --best -k {} \+
 
-FROM caddy:2-alpine
+FROM us-central1-docker.pkg.dev/mechapower/cache/caddy:2-alpine
 COPY --from=compressor /app/srv /srv
 COPY ./Caddyfile /etc/caddy/Caddyfile
