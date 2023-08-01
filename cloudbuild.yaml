@@ -1,23 +1,18 @@
 steps:
-  - id: Fetch Brotli Binary
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-    entrypoint: gcloud
-    args: ["storage", "cp", "$_BROTLI_BIN", "brotli.tar.gz"]
-  - id: Build Container
-    name: gcr.io/cloud-builders/docker
-    args: ["build", "-t", "$_APP_IMAGE:$SHORT_SHA", "."]
-  - id: Push Container
-    name: gcr.io/cloud-builders/docker
-    args: ["push", "$_APP_IMAGE:$SHORT_SHA"]
-  - id: Deploy to Cloud Run
-    name: gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
-    entrypoint: gcloud
+  - name: gcr.io/cloud-builders/npm
     args:
-      [
-        "run",
-        "deploy",
-        "$_SERVICE",
-        "--image=$_APP_IMAGE:$SHORT_SHA",
-        "--region=us-central1",
-        "--async",
-      ]
+      - ci
+    id: Install
+  - name: gcr.io/cloud-builders/npm
+    args:
+      - run
+      - build
+    id: Build
+  - name: gcr.io/cloud-builders/gcloud
+    env:
+      - SRV=$_SRV
+    id: Sync
+    script: |
+      mkdir empty
+      gsutil -m rsync -r -d empty gs://mecha-build-artifacts/$SRV
+      gsutil -m cp -r srv/* gs://mecha-build-artifacts/$SRV
