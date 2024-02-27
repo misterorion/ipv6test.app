@@ -3,8 +3,8 @@
   "author": "Orion Anderson <orion@mechapower.com>",
   "license": "MIT",
   "scripts": {
-    "minifyJS": "uglifyjs src/confetti.js src/report.js -c -m -o srv/assets/scripts.min.js",
-    "buildCSS": "postcss src/tailwind.css -o srv/assets/styles.min.css",
+    "minifyJS": "uglifyjs src/confetti.js src/report.js -c -m -o dist/assets/scripts.min.js",
+    "buildCSS": "postcss src/tailwind.css -o dist/assets/styles.min.css",
     "build": "npm run minifyJS && npm run buildCSS"
   },
   "devDependencies": {
