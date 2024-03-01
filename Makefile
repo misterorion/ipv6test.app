@@ -13,9 +13,6 @@ build: install
 lockfile:
 	@npm install --package-lock-only
 
-dev:
-	@npm run dev
-
 deploy:
 	@git add .
 	@git commit -m "Updates"

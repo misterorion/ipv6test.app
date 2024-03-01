@@ -9,6 +9,7 @@ module.exports = {
     'border-purple',
     'bg-yellow',
     'border-yellow',
+    'text-center',
     'text-black',
     'text-white'
   ]
