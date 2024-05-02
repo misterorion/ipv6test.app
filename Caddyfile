@@ -1,0 +1,46 @@
+{
+	admin off
+	auto_https off
+	http_port 8080
+	log default {
+		output stdout
+		format json {
+			time_format wall
+		}
+		include http.log.access
+	}
+	persist_config off
+}
+
+http://ipv6test.app, http://v6.ipv6test.app, http://v4.ipv6test.app {
+	root * /srv
+	file_server
+	templates
+
+	respond /templates/* 404
+
+	header {
+		Content-Security-Policy "script-src 'self'; frame-ancestors 'none'"
+		Permissions-Policy "geolocation=()"
+		Referrer-Policy "no-referrer"
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-XSS-Protection "1; mode=block"
+	}
+
+	@cache_one_week {
+		path /assets/*
+		path /robots.txt
+		path /favicon.ico
+	}
+	route {
+		header Cache-Control no-store
+		header @cache_one_week Cache-Control "public,max-age=604800,must-revalidate"
+	}
+}
+
+# default
+http:// {
+	respond /healthz 200
+	respond 404
+}
