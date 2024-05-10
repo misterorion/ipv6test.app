@@ -40,9 +40,6 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Compute short sha
-        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
@@ -50,25 +47,11 @@ jobs:
           platforms: linux/arm64
           provenance: false
           push: true
-          tags: ${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}
-
-      - name: Download task definition
-        run: |
-          aws ecs describe-task-definition \
-            --task-definition ${{ vars.TASK_DEFINITION_FAMILY }} \
-            --query taskDefinition > task-definition.json
-
-      - name: Update task definition
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          container-name: caddy
-          image: ${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}
+          tags: ${{ vars.IMAGE_REPO }}:latest
 
       - name: Update service
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: task-definition.json
-          service: ${{ vars.ECS_SERVICE }}
-          cluster: ${{ vars.ECS_CLUSTER }}
-          wait-for-service-stability: true
+        run: |
+          aws ecs update-service \
+            --cluster ${{ vars.ECS_CLUSTER }} \
+            --service ${{ vars.ECS_SERVICE }} \
+            --force-new-deployment > /dev/null
