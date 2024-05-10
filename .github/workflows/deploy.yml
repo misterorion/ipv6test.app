@@ -47,7 +47,6 @@ jobs:
       #   run: echo "${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}"
 
       - name: Build and push image
-        id: build-image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -58,15 +57,16 @@ jobs:
 
       - name: Download task definition
         run: |
-          aws ecs describe-task-definition --task-definition ${{ vars.TASK_DEFINITION_FAMILY }} --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition \
+            --task-definition ${{ vars.TASK_DEFINITION_FAMILY }} \
+            --query taskDefinition > task-definition.json
 
       - name: Update task definition
-        id: update-task-definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
           container-name: caddy
-          image: ${{ vars.IMAGE_REPO }}:{{ env.SHORT_SHA }}
+          image: ${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}
 
       - name: Update service
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
