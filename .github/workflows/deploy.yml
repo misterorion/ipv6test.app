@@ -9,6 +9,9 @@ on:
 permissions:
   id-token: write # Allow requesting OIDC JWT token
 
+env:
+  SHORT_SHA: $(git rev-parse --short HEAD)
+
 jobs:
   release:
     name: Deploy
@@ -40,11 +43,11 @@ jobs:
       # - name: Set up Docker Buildx
       #   uses: docker/setup-buildx-action@v3
 
-      - name: Compute short sha
-        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+      # - name: Compute short sha
+      #   run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Test vars
-        run: echo ${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}
+        run: echo "${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}"
 
       # - name: Build and push image
       #   id: build-image
