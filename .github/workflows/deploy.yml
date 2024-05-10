@@ -9,9 +9,6 @@ on:
 permissions:
   id-token: write # Allow requesting OIDC JWT token
 
-env:
-  AWS_REGION: {{ vars.AWS_REGION  }}
-
 jobs:
   release:
     name: Deploy
@@ -31,7 +28,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ vars.IAM_ROLE }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Login to ECR
         id: login-ecr
