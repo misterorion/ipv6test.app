@@ -43,9 +43,6 @@ jobs:
       - name: Compute short sha
         run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-      # - name: Test vars
-      #   run: echo "${{ vars.IMAGE_REPO }}:${{ env.SHORT_SHA }}"
-
       - name: Build and push image
         uses: docker/build-push-action@v5
         with:
