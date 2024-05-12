@@ -1,8 +1,10 @@
 {
-	admin off
 	auto_https off
 	http_port 8080
 	persist_config off
+	servers {
+		metrics
+	}
 }
 
 http:// {
