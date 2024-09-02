@@ -12,5 +12,8 @@ build: install
 lockfile:
 	@npm install --package-lock-only
 
+docker-local: build
+	@docker buildx build --platform=arm64 -t 733051452450.dkr.ecr.us-east-2.amazonaws.com/noriko/ipv6test:latest . --push --provenance=false
+
 docker: build
 	@docker buildx build -t 733051452450.dkr.ecr.us-east-2.amazonaws.com/noriko/ipv6test:latest . --push --provenance=false

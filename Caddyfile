@@ -1,4 +1,7 @@
 {
+	admin :2019 {
+		origins 10.0.0.0/16 2600:1f16:10b8:f800::/56
+	}
 	auto_https off
 	http_port 8080
 	persist_config off
