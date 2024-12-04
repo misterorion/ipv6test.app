@@ -13,57 +13,32 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Publish new version
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ vars.IAM_ROLE }}
+        aws-region: us-east-2
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22.x"
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: build
       env:
-        FUNCTION_NAME: test-env
-      run: ./.github/scripts/test.sh
-
-    # - name: Configure AWS credentials
-    #   uses: aws-actions/configure-aws-credentials@v4
-    #   with:
-    #     role-to-assume: ${{ vars.IAM_ROLE }}
-    #     aws-region: us-east-2
-
-    # - name: Login to ECR
-    #   id: login-ecr
-    #   uses: aws-actions/amazon-ecr-login@v2
-
-    # - name: Setup Node
-    #   uses: actions/setup-node@v4
-    #   with:
-    #     node-version: "22.x"
-
-    # - name: Install dependencies
-    #   run: npm ci
-
-    # - name: Build
-    #   run: npm run build
-
-    # - name: Sync to S3
-    #   run: aws s3 sync ./dist s3://${{ vars.S3_BUCKET }} --delete
-
-    # - name: Set up QEMU
-    #   uses: docker/setup-qemu-action@v3
-
-    # - name: Set up Docker Buildx
-    #   uses: docker/setup-buildx-action@v3
-
-    # - name: Generate tag
-    #   id: generate-tag
-    #   run: echo "tag=$(git rev-parse --short HEAD)-$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
-
-    # - name: Generate version file
-    #   run: echo "${{ steps.generate-tag.outputs.tag }}" > version
-
-    # - name: Build and push container
-    #   id: build-docker
-    #   uses: docker/build-push-action@v5
-    #   with:
-    #     context: .
-    #     platforms: linux/arm64
-    #     provenance: false
-    #     push: true
-    #     tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
+        ECR_REPO: ${{ vars.ECR_REPO }}
+        S3_BUCKET: ${{ vars.S3_BUCKET }}
+      run: ./.github/scripts/build.sh
 
     # - name: Publish new version
     #   env:
