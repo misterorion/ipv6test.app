@@ -1,0 +1,77 @@
+name: Deploy
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ vars.IAM_ROLE }}
+        aws-region: us-east-2
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22.x"
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build
+      run: npm run build
+
+    - name: Sync to S3
+      run: aws s3 sync ./dist s3://${{ vars.S3_BUCKET }} --delete
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Generate tag
+      id: generate-tag
+      run: echo "tag=$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
+
+    - name: Build and push container
+      id: build-docker
+      uses: docker/build-push-action@v5
+      with:
+        platforms: linux/arm64
+        provenance: false
+        push: true
+        tags: 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:${{ steps.generate-tag.outputs.tag }}
+
+    - name: Publish new version
+      env:
+        FUNCTION_NAME: ip6test
+        IMAGE_DIGEST: ${{ steps.build-docker.outputs.digest }}
+      run: |
+        aws lambda update-function-code \
+          --function-name $FUNCTION_NAME \
+          --image-uri 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test@$IMAGE_DIGEST
+
+        VERSION=$(aws lambda publish-version \
+          --function-name $FUNCTION_NAME \
+          --description 'New deployment' \
+          --query 'Version' \
+          --output text)
+
+        aws lambda update-alias \
+          --function-name $FUNCTION_NAME \
+          --function-version "$VERSION" \
+          --name main

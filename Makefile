@@ -1,19 +1,6 @@
-clean:
-	@rm -rf ./node_modules
-	@rm package-lock.json
-	@make lockfile
-
-install:
-	@npm install
-
-build: install
-	@npm run build
-
-lockfile:
-	@npm install --package-lock-only
-
-docker-local: build
-	@docker buildx build --platform=arm64 -t 733051452450.dkr.ecr.us-east-2.amazonaws.com/noriko/ipv6test:latest . --push --provenance=false
-
-docker: build
-	@docker buildx build -t 733051452450.dkr.ecr.us-east-2.amazonaws.com/noriko/ipv6test:latest . --push --provenance=false
+build:
+	aws ecr batch-delete-image --repository-name lambda/ipv6test --image-ids imageTag=latest
+	# tag=$(git rev-parse --short HEAD)-$(date +"%Y%m%d-%H%M%S")
+	# docker buildx build --platform linux/arm64 -t 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:$tag . --push
+	# docker tag 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:$tag 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:latest
+	# docker push 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:latest
