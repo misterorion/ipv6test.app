@@ -34,10 +34,10 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 		time.Now().Format("Jan 2, 2006 15:04:05 MST"),
 	}
 
-	log.Info().
+	log.Log().
 		Str("true-client-ip", data.Ip).
 		Str("user-agent", request.Headers["user-agent"]).
-		Msg("OK")
+		Msg("")
 
 	var buf bytes.Buffer
 
