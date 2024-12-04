@@ -18,6 +18,7 @@ echo "$TAG" > version
 docker buildx build . \
     --platform linux/arm64 \
     --tag "$ECR_REPO:$TAG" \
+    --provenance=false \
     --push
 
 # Update Lambda function code, create version, and assign alias
