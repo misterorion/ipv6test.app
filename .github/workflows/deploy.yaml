@@ -66,6 +66,31 @@ jobs:
           --function-name ${{ vars.FUNCTION_NAME }} \
           --image-uri ${{ vars.ECR_REPO }}@${{ steps.build-docker.outputs.digest }}
 
+        # Wait for function update to complete
+        MAX_ATTEMPTS=60
+        ATTEMPT=0
+
+        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            UPDATE_STATUS=$(aws lambda get-function-configuration \
+                --function-name ${{ vars.FUNCTION_NAME }} \
+                --query 'LastUpdateStatus' \
+                --output text 2>/dev/null)
+
+            if [ "$UPDATE_STATUS" = "Successful" ]; then
+                echo "Function code update successful"
+                break
+            fi
+
+            if [ "$UPDATE_STATUS" = "Failed" ]; then
+                echo "Function code update failed"
+                exit 1
+            fi
+
+            echo "Waiting for function update (attempt $((ATTEMPT+1))/$MAX_ATTEMPTS)"
+            sleep 10
+            ((ATTEMPT++))
+        done
+
         VERSION=$(aws lambda publish-version \
           --function-name ${{ vars.FUNCTION_NAME }} \
           --description 'New deployment' \
