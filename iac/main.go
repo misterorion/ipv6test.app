@@ -226,22 +226,22 @@ func main() {
 		// CloudFront distributions
 
 		type distributionConfig struct {
-			dns  string
-			cert pulumi.StringOutput
+			dns     string
+			certArn pulumi.StringOutput
 		}
 
 		distributionConfigs := []distributionConfig{
 			{
-				dns:  "ipv6test.app",
-				cert: config.RequireSecret("ipv6test.app"),
+				dns:     "ipv6test.app",
+				certArn: config.RequireSecret("ipv6test.app"),
 			},
 			{
-				dns:  "v6.ipv6test.app",
-				cert: config.RequireSecret("v6.ipv6test.app"),
+				dns:     "v6.ipv6test.app",
+				certArn: config.RequireSecret("v6.ipv6test.app"),
 			},
 			{
-				dns:  "v4.ipv6test.app",
-				cert: config.RequireSecret("v4.ipv6test.app"),
+				dns:     "v4.ipv6test.app",
+				certArn: config.RequireSecret("v4.ipv6test.app"),
 			},
 		}
 
@@ -327,7 +327,7 @@ func main() {
 						},
 					},
 					ViewerCertificate: &cloudfront.DistributionViewerCertificateArgs{
-						AcmCertificateArn:      distributionConfig.cert,
+						AcmCertificateArn:      distributionConfig.certArn,
 						MinimumProtocolVersion: pulumi.String("TLSv1.2_2021"),
 						SslSupportMethod:       pulumi.String("sni-only"),
 					},
