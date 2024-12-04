@@ -37,7 +37,7 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	log.Info().
 		Str("true-client-ip", data.Ip).
 		Str("user-agent", request.Headers["user-agent"]).
-		Send()
+		Msg("OK")
 
 	var buf bytes.Buffer
 
