@@ -16,13 +16,18 @@ TAG=$(git rev-parse --short HEAD)
 echo "$TAG" > version
 
 docker buildx build . \
-    --platform linux/arm64 \
     --tag "$ECR_REPO:$TAG" \
-    --push
+    --platform linux/arm64 \
+    --push \
+    --provenance=false
 
 # Update Lambda function code, create version, and assign alias
 
-SHA_256=$(docker inspect --format='{{index .RepoDigests 0}}' "$ECR_REPO:$TAG")
+SHA_256=$(aws ecr describe-images \
+            --repository-name lambda/ipv6test \
+            --image-ids imageTag="$TAG" \
+            --query 'imageDetails[0].imageDigest' \
+            --output text)
 
 # Function to wait for a specific status with retries
 wait_for_status() {
