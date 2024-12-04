@@ -76,18 +76,18 @@ jobs:
         ATTEMPT=0
 
         while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-            version_status=$(aws lambda get-function-configuration \
+            VERSION_STATUS=$(aws lambda get-function-configuration \
                 --function-name ${{ vars.FUNCTION_NAME }} \
                 --qualifier "$VERSION" \
                 --query 'LastUpdateStatus' \
                 --output text 2>/dev/null)
 
-            if [ "$version_status" = "Successful" ]; then
+            if [ "$VERSION_STATUS" = "Successful" ]; then
                 echo "Version $VERSION is ready"
                 break
             fi
 
-            if [ "$version_status" = "Failed" ]; then
+            if [ "$VERSION_STATUS" = "Failed" ]; then
                 echo "Version $VERSION failed to update"
                 exit 1
             fi
