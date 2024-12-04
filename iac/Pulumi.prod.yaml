@@ -1,0 +1,17 @@
+encryptionsalt: v1:9/yGWkQ9s+c=:v1:faOn9xsniu5EEn7A:VpamD9AQHG+HashyDL6Gz5fSRtT47Q==
+config:
+  ipv6test:ipv6test.app:
+    secure: v1:DWLB0kxm8ffmxbbM:yGk4bEqkQWg8gfM1Ia4WTN1I05RkPEvBmH3dCZeAbV1hl6pgu/ejQu3AQa4GJ6E4o1JCt2QvHIgMvkuYZm+eAlsKUdcJq/FQFDVVjjr9IYYiU20RQ181LcICrqG72ZyQ6hsD
+  ipv6test:v4.ipv6test.app:
+    secure: v1:Pcp/S7mV19LVwIvP:MRl1uX87PybicMrFTeFG9q6MSwEI/NukDI47zA5mV+qMDyZIfUrWDubaBxG2k/RZVqNz9M9HwFGXM3co8+3K5sDSAzugT0pWuz2BDzuoMUoGADdiIMg8bGupiHYlu1c2Ri0L
+  ipv6test:v6.ipv6test.app:
+    secure: v1:Srp6RSUcOl8yrF4o:cclQc/fOWB5SSpWMfGe8tOOsbIN65L8YA5ZVu65XWENEI0QD3KOKMJEis6cy4SukkVwDdVcpe6Bd+gq6SXahoh+dGocr9Jl2L5OdO0+/a/tBEnpl6iYtlyhlF/WdRbS3g/nM
+  ipv6test:x-cdn-auth:
+    secure: v1:JR6v3q2Ni1vCO7vt:/n2I137rM4I+8DWHrWspoMYmuM2ft4IC
+  aws-native:region: us-east-2
+  ipv6test:bucket-name:
+    secure: v1:Ly/M1A4vZZVZ8ngK:mfW+ISSHTl5CoxBm8Rf7KUfJSZdWHYZPFi3iQVy6E8KAFCcW3w==
+  ipv6test:account-id:
+    secure: v1:X3p0EOdLJCJ8wPBY:+raVq+VLaysNLY7yVAZFwM8wR4whfWOQtWMxHw==
+  ipv6test:zone-id:
+    secure: v1:ABJmRTfrJWjPjAeY:h70vKMFFTJ5BHZvKBEf3MZRhwuuzqk3xuNZ/SpdTtvTWZ3u/Jg==
