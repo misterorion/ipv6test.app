@@ -97,7 +97,7 @@ func main() {
 
 		logGroup, err := logs.NewLogGroup(ctx, "log-group", &logs.LogGroupArgs{
 			LogGroupName:    pulumi.String("/aws/lambda/ipv6test"),
-			RetentionInDays: pulumi.Int(1),
+			RetentionInDays: pulumi.Int(7),
 			Tags:            commonTags,
 		})
 		if err != nil {
