@@ -15,12 +15,11 @@ TAG=$(git rev-parse --short HEAD)
 
 echo "$TAG" > version
 
-docker buildx build \
-    -t "$ECR_REPO:$TAG" \
+docker buildx build . \
+    --tag "$ECR_REPO:$TAG" \
     --platform linux/arm64 \
     --push \
-    --provenance=false \
-    .
+    --provenance=false
 
 # Update Lambda function code, create version, and assign alias
 
