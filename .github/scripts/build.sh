@@ -2,14 +2,14 @@
 
 set -e
 
-# Build and deploy static files
+# 1. Build and deploy static files
 
 npm ci
 npm run build
 
 aws s3 sync ./dist s3://"$S3_BUCKET" --delete
 
-# Build and push Lambda container image
+# 2. Build and push Lambda container image
 
 TAG=$(git rev-parse --short HEAD)
 
@@ -21,7 +21,7 @@ docker buildx build . \
     --push \
     --provenance=false
 
-# Update Lambda function code, create version, and assign alias
+# 3. Update Lambda function code, create version, and assign alias
 
 SHA_256=$(aws ecr describe-images \
             --repository-name lambda/ipv6test \
@@ -29,7 +29,6 @@ SHA_256=$(aws ecr describe-images \
             --query 'imageDetails[0].imageDigest' \
             --output text)
 
-# Function to wait for a specific status with retries
 wait_for_status() {
     local description="$1"
     local max_attempts=30
@@ -57,15 +56,11 @@ wait_for_status() {
     return 1
 }
 
-# Update function code
-
 aws lambda update-function-code \
     --function-name "$FUNCTION_NAME" \
     --image-uri "$ECR_REPO@$SHA_256"
 
 wait_for_status 'Function code update' || exit 1
-
-# Create new version
 
 VERSION=$(aws lambda publish-version \
             --function-name "$FUNCTION_NAME" \
@@ -74,8 +69,6 @@ VERSION=$(aws lambda publish-version \
             --output text)
 
 wait_for_status "Version $VERSION" || exit 1
-
-# Move alias to new version
 
 aws lambda update-alias \
     --function-name "$FUNCTION_NAME" \
