@@ -50,31 +50,34 @@ jobs:
     - name: Generate version file
       run: echo "${{ steps.generate-tag.outputs.tag }}" > version
 
-    - name: Build and push container
-      id: build-docker
-      uses: docker/build-push-action@v5
-      with:
-        platforms: linux/arm64
-        provenance: false
-        push: true
-        tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
+    - name: Check version file
+      run: cat version
 
-    - name: Publish new version
-      env:
-        FUNCTION_NAME: ip6test
-        IMAGE_DIGEST: ${{ steps.build-docker.outputs.digest }}
-      run: |
-        aws lambda update-function-code \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --image-uri ${{ vars.ECR_REPO }}@$IMAGE_DIGEST
+    # - name: Build and push container
+    #   id: build-docker
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     platforms: linux/arm64
+    #     provenance: false
+    #     push: true
+    #     tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
 
-        VERSION=$(aws lambda publish-version \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --description 'New deployment' \
-          --query 'Version' \
-          --output text)
+    # - name: Publish new version
+    #   env:
+    #     FUNCTION_NAME: ip6test
+    #     IMAGE_DIGEST: ${{ steps.build-docker.outputs.digest }}
+    #   run: |
+    #     aws lambda update-function-code \
+    #       --function-name ${{ vars.FUNCTION_NAME }} \
+    #       --image-uri ${{ vars.ECR_REPO }}@$IMAGE_DIGEST
 
-        aws lambda update-alias \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --function-version "$VERSION" \
-          --name main
+    #     VERSION=$(aws lambda publish-version \
+    #       --function-name ${{ vars.FUNCTION_NAME }} \
+    #       --description 'New deployment' \
+    #       --query 'Version' \
+    #       --output text)
+
+    #     aws lambda update-alias \
+    #       --function-name ${{ vars.FUNCTION_NAME }} \
+    #       --function-version "$VERSION" \
+    #       --name main
