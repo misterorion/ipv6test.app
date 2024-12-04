@@ -233,15 +233,15 @@ func main() {
 		distributionConfigs := []distributionConfig{
 			{
 				dns:     "ipv6test.app",
-				certArn: config.RequireSecret("ipv6test.app"),
+				certArn: config.RequireSecret("certArn-ipv6test.app"),
 			},
 			{
 				dns:     "v6.ipv6test.app",
-				certArn: config.RequireSecret("v6.ipv6test.app"),
+				certArn: config.RequireSecret("certArn-v6.ipv6test.app"),
 			},
 			{
 				dns:     "v4.ipv6test.app",
-				certArn: config.RequireSecret("v4.ipv6test.app"),
+				certArn: config.RequireSecret("certArn-v4.ipv6test.app"),
 			},
 		}
 
