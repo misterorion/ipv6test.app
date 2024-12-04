@@ -47,7 +47,7 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 
 	err = t.Execute(&buf, data)
 	if err != nil {
-		log.Error().Err(err).Msg("error executing template")
+		log.Error().Err(err).Send()
 		return events.LambdaFunctionURLResponse{
 			StatusCode: 500,
 			Body:       "Internal server error",
