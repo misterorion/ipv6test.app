@@ -12,15 +12,15 @@ import (
 )
 
 var (
-	err error
-	log zerolog.Logger
-	t   *template.Template
+	err  error
+	log  zerolog.Logger
+	tmpl *template.Template
 )
 
 func init() {
 	log = zerolog.New(os.Stdout).With().Logger()
 
-	t, err = template.ParseFiles("index.tmpl")
+	tmpl, err = template.ParseFiles("index.tmpl")
 	if err != nil {
 		log.Error().Err(err).Send()
 		os.Exit(1)
@@ -45,7 +45,7 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 
 	var buf bytes.Buffer
 
-	err = t.Execute(&buf, data)
+	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		log.Error().Err(err).Send()
 		return events.LambdaFunctionURLResponse{
