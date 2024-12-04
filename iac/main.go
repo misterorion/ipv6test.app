@@ -350,7 +350,7 @@ func main() {
 				return err
 			}
 
-			zoneId := config.RequireSecret("zone-id")
+			zoneId := config.RequireSecret("route53-zone-id")
 			if distributionConfig.dns == "ipv6test.app" {
 				err = newDnsRecord(ctx, "ipv6test-a", "ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeA)
 				if err != nil {
