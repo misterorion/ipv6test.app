@@ -5,7 +5,7 @@ RUN go mod download
 COPY main.go .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -ldflags="-s -w" -tags lambda.norpc -o main main.go
 
-FROM public.ecr.aws/lambda/provided:al2023
+FROM public.ecr.aws/docker/library/alpine:latest
 COPY --from=build /app/main ./main
 COPY version index.tmpl ./
 ENTRYPOINT [ "./main" ]
