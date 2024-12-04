@@ -1,4 +1,4 @@
-name: Deploy
+name: Build
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -39,5 +39,6 @@ jobs:
     - name: build
       env:
         ECR_REPO: ${{ vars.ECR_REPO }}
+        FUNCTION_NAME: ${{ vars.FUNCTION_NAME }}
         S3_BUCKET: ${{ vars.S3_BUCKET }}
       run: ./.github/scripts/build.sh
