@@ -1,6 +1,8 @@
 name: Deploy
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
 
 permissions:
@@ -39,10 +41,3 @@ jobs:
         ECR_REPO: ${{ vars.ECR_REPO }}
         S3_BUCKET: ${{ vars.S3_BUCKET }}
       run: ./.github/scripts/build.sh
-
-    # - name: Publish new version
-    #   env:
-    #     FUNCTION_NAME: ${{ vars.FUNCTION_NAME }}
-    #     ECR_REPO: ${{ vars.ECR_REPO }}
-    #     DIGEST: ${{ steps.build-docker.outputs.digest }}
-    #   run: ./.github/scripts/publish.sh
