@@ -61,19 +61,48 @@ jobs:
         tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
 
     - name: Publish new version
-      env:
-        FUNCTION_NAME: ip6test
-        IMAGE_DIGEST: ${{ steps.build-docker.outputs.digest }}
       run: |
         aws lambda update-function-code \
           --function-name ${{ vars.FUNCTION_NAME }} \
-          --image-uri ${{ vars.ECR_REPO }}@$IMAGE_DIGEST
+          --image-uri ${{ vars.ECR_REPO }}@${{ steps.build-docker.outputs.digest }}
 
         VERSION=$(aws lambda publish-version \
           --function-name ${{ vars.FUNCTION_NAME }} \
           --description 'New deployment' \
           --query 'Version' \
           --output text)
+
+        MAX_ATTEMPTS=30
+        ATTEMPT=0
+
+        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            version_status=$(aws lambda get-function-configuration \
+                --function-name ${{ vars.FUNCTION_NAME }} \
+                --qualifier "$VERSION" \
+                --query 'LastUpdateStatus' \
+                --output text 2>/dev/null)
+
+            if [ "$version_status" = "Successful" ]; then
+                echo "Version $VERSION is ready"
+                break
+            fi
+
+            if [ "$version_status" = "Failed" ]; then
+                echo "Version $VERSION failed to update"
+                exit 1
+            fi
+
+            echo "Waiting for version $VERSION to be ready (attempt $((ATTEMPT+1))/$MAX_ATTEMPTS)"
+
+            sleep 10
+
+            ((ATTEMPT++))
+        done
+
+        if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+            echo "Timeout waiting for version $VERSION to be ready"
+            exit 1
+        fi
 
         aws lambda update-alias \
           --function-name ${{ vars.FUNCTION_NAME }} \
