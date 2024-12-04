@@ -13,123 +13,61 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        role-to-assume: ${{ vars.IAM_ROLE }}
-        aws-region: us-east-2
-
-    - name: Login to ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v2
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: "22.x"
-
-    - name: Install dependencies
-      run: npm ci
-
-    - name: Build
-      run: npm run build
-
-    - name: Sync to S3
-      run: aws s3 sync ./dist s3://${{ vars.S3_BUCKET }} --delete
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-
-    - name: Generate tag
-      id: generate-tag
-      run: echo "tag=$(git rev-parse --short HEAD)-$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
-
-    - name: Generate version file
-      run: echo "${{ steps.generate-tag.outputs.tag }}" > version
-
-    - name: Build and push container
-      id: build-docker
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        platforms: linux/arm64
-        provenance: false
-        push: true
-        tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
-
     - name: Publish new version
-      run: |
-        aws lambda update-function-code \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --image-uri ${{ vars.ECR_REPO }}@${{ steps.build-docker.outputs.digest }}
+      env:
+        FUNCTION_NAME: test-env
+      run: ./.github/scripts/test.sh
 
-        # Wait for function update to complete
-        MAX_ATTEMPTS=60
-        ATTEMPT=0
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     role-to-assume: ${{ vars.IAM_ROLE }}
+    #     aws-region: us-east-2
 
-        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-            UPDATE_STATUS=$(aws lambda get-function-configuration \
-                --function-name ${{ vars.FUNCTION_NAME }} \
-                --query 'LastUpdateStatus' \
-                --output text 2>/dev/null)
+    # - name: Login to ECR
+    #   id: login-ecr
+    #   uses: aws-actions/amazon-ecr-login@v2
 
-            if [ "$UPDATE_STATUS" = "Successful" ]; then
-                echo "Function code update successful"
-                break
-            fi
+    # - name: Setup Node
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: "22.x"
 
-            if [ "$UPDATE_STATUS" = "Failed" ]; then
-                echo "Function code update failed"
-                exit 1
-            fi
+    # - name: Install dependencies
+    #   run: npm ci
 
-            echo "Waiting for function update (attempt $((ATTEMPT+1))/$MAX_ATTEMPTS)"
-            sleep 10
-            ((ATTEMPT++))
-        done
+    # - name: Build
+    #   run: npm run build
 
-        VERSION=$(aws lambda publish-version \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --description 'New deployment' \
-          --query 'Version' \
-          --output text)
+    # - name: Sync to S3
+    #   run: aws s3 sync ./dist s3://${{ vars.S3_BUCKET }} --delete
 
-        MAX_ATTEMPTS=30
-        ATTEMPT=0
+    # - name: Set up QEMU
+    #   uses: docker/setup-qemu-action@v3
 
-        while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
-            VERSION_STATUS=$(aws lambda get-function-configuration \
-                --function-name ${{ vars.FUNCTION_NAME }} \
-                --qualifier "$VERSION" \
-                --query 'LastUpdateStatus' \
-                --output text 2>/dev/null)
+    # - name: Set up Docker Buildx
+    #   uses: docker/setup-buildx-action@v3
 
-            if [ "$VERSION_STATUS" = "Successful" ]; then
-                echo "Version $VERSION is ready"
-                break
-            fi
+    # - name: Generate tag
+    #   id: generate-tag
+    #   run: echo "tag=$(git rev-parse --short HEAD)-$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
 
-            if [ "$VERSION_STATUS" = "Failed" ]; then
-                echo "Version $VERSION failed to update"
-                exit 1
-            fi
+    # - name: Generate version file
+    #   run: echo "${{ steps.generate-tag.outputs.tag }}" > version
 
-            echo "Waiting for version $VERSION to be ready (attempt $((ATTEMPT+1))/$MAX_ATTEMPTS)"
+    # - name: Build and push container
+    #   id: build-docker
+    #   uses: docker/build-push-action@v5
+    #   with:
+    #     context: .
+    #     platforms: linux/arm64
+    #     provenance: false
+    #     push: true
+    #     tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
 
-            sleep 10
-
-            ((ATTEMPT++))
-        done
-
-        if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
-            echo "Timeout waiting for version $VERSION to be ready"
-            exit 1
-        fi
-
-        aws lambda update-alias \
-          --function-name ${{ vars.FUNCTION_NAME }} \
-          --function-version "$VERSION" \
-          --name main
+    # - name: Publish new version
+    #   env:
+    #     FUNCTION_NAME: ${{ vars.FUNCTION_NAME }}
+    #     ECR_REPO: ${{ vars.ECR_REPO }}
+    #     DIGEST: ${{ steps.build-docker.outputs.digest }}
+    #   run: ./.github/scripts/publish.sh
