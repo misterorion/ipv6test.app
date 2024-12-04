@@ -1,11 +1,13 @@
 #!/bin/bash
 
+set -e
+
 # Build and deploy static files
 
 npm ci
 npm run build
 
-aws s3 sync ./dist s3://"$BUCKET" --delete
+aws s3 sync ./dist s3://"$S3_BUCKET" --delete
 
 # Build and push Lambda container image
 
