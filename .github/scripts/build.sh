@@ -57,11 +57,15 @@ wait_for_status() {
     return 1
 }
 
+# Update function code
+
 aws lambda update-function-code \
     --function-name "$FUNCTION_NAME" \
     --image-uri "$ECR_REPO@$SHA_256"
 
 wait_for_status 'Function code update' || exit 1
+
+# Create new version
 
 VERSION=$(aws lambda publish-version \
             --function-name "$FUNCTION_NAME" \
@@ -70,6 +74,8 @@ VERSION=$(aws lambda publish-version \
             --output text)
 
 wait_for_status "Version $VERSION" || exit 1
+
+# Move alias to new version
 
 aws lambda update-alias \
     --function-name "$FUNCTION_NAME" \
