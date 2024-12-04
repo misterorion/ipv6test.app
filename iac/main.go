@@ -50,11 +50,13 @@ func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
 
 		config := config.New(ctx, "")
+		accountId := config.RequireSecret("account-id")
+		bucketName := config.RequireSecret("bucket-name")
 
 		// S3 Bucket for Assets
 
 		bucket, err := s3.NewBucket(ctx, "bucket", &s3.BucketArgs{
-			BucketName: config.RequireSecret("bucket-name"),
+			BucketName: bucketName,
 		})
 		if err != nil {
 			return err
@@ -130,7 +132,7 @@ func main() {
 				lambda.FunctionArchitecturesItemArm64,
 			},
 			Code: lambda.FunctionCodeArgs{
-				ImageUri: pulumi.Sprintf("%v.dkr.ecr.us-east-2.amazonaws.com/base:latest", config.RequireSecret("account-id")), // placeholder; build in GitHub to deploy
+				ImageUri: pulumi.Sprintf("%v.dkr.ecr.us-east-2.amazonaws.com/base:latest", accountId), // placeholder; build in GitHub to deploy
 			},
 			Description:  pulumi.String("Send static web page"),
 			FunctionName: pulumi.String("ipv6test"),
@@ -193,6 +195,8 @@ func main() {
 			return err
 		}
 
+		// CloudFront access
+
 		oacS3, err := cloudfront.NewOriginAccessControl(ctx, "s3", &cloudfront.OriginAccessControlArgs{
 			OriginAccessControlConfig: &cloudfront.OriginAccessControlConfigArgs{
 				Description:                   pulumi.String("Access to static assets"),
@@ -218,6 +222,8 @@ func main() {
 		if err != nil {
 			return err
 		}
+
+		// CloudFront distributions
 
 		type distributionConfig struct {
 			dns  string
@@ -338,7 +344,7 @@ func main() {
 				Action:       pulumi.String("lambda:InvokeFunctionUrl"),
 				FunctionName: pulumi.Sprintf("%v:%v", function.Arn, alias.Name),
 				Principal:    pulumi.String("cloudfront.amazonaws.com"),
-				SourceArn:    pulumi.Sprintf("arn:aws:cloudfront::%v:distribution/%v", config.RequireSecret("account-id"), distribution.ID()),
+				SourceArn:    pulumi.Sprintf("arn:aws:cloudfront::%v:distribution/%v", accountId, distribution.ID()),
 			})
 			if err != nil {
 				return err
@@ -373,7 +379,7 @@ func main() {
 		}
 
 		_, err = s3.NewBucketPolicy(ctx, "policy", &s3.BucketPolicyArgs{
-			Bucket: bucket.BucketName.Elem().ToStringOutput(),
+			Bucket: bucketName,
 			PolicyDocument: pulumi.Sprintf(`{
 				"Version": "2008-10-17",
 				"Id": "PolicyForCloudFrontPrivateContent",
@@ -396,7 +402,7 @@ func main() {
 						}
 					}
 				]
-			}`, bucket.BucketName.Elem().ToStringOutput(), config.RequireSecret("account-id"), distributionIds[0], config.RequireSecret("account-id"), distributionIds[1], config.RequireSecret("account-id"), distributionIds[2]),
+			}`, bucketName, accountId, distributionIds[0], accountId, distributionIds[1], accountId, distributionIds[2]),
 		})
 		if err != nil {
 			return err
