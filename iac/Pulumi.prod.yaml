@@ -11,7 +11,5 @@ config:
     secure: v1:Pcp/S7mV19LVwIvP:MRl1uX87PybicMrFTeFG9q6MSwEI/NukDI47zA5mV+qMDyZIfUrWDubaBxG2k/RZVqNz9M9HwFGXM3co8+3K5sDSAzugT0pWuz2BDzuoMUoGADdiIMg8bGupiHYlu1c2Ri0L
   ipv6test:certArn-v6.ipv6test.app:
     secure: v1:Srp6RSUcOl8yrF4o:cclQc/fOWB5SSpWMfGe8tOOsbIN65L8YA5ZVu65XWENEI0QD3KOKMJEis6cy4SukkVwDdVcpe6Bd+gq6SXahoh+dGocr9Jl2L5OdO0+/a/tBEnpl6iYtlyhlF/WdRbS3g/nM
-  ipv6test:x-cdn-auth:
-    secure: v1:JR6v3q2Ni1vCO7vt:/n2I137rM4I+8DWHrWspoMYmuM2ft4IC
-  ipv6test:zone-id:
+  ipv6test:route53-zone-id:
     secure: v1:ABJmRTfrJWjPjAeY:h70vKMFFTJ5BHZvKBEf3MZRhwuuzqk3xuNZ/SpdTtvTWZ3u/Jg==
