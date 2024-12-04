@@ -54,7 +54,7 @@ jobs:
         platforms: linux/arm64
         provenance: false
         push: true
-        tags: 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:${{ steps.generate-tag.outputs.tag }}
+        tags: ${{ vars.ECR_REPO }}:${{ steps.generate-tag.outputs.tag }}
 
     - name: Publish new version
       env:
@@ -62,16 +62,16 @@ jobs:
         IMAGE_DIGEST: ${{ steps.build-docker.outputs.digest }}
       run: |
         aws lambda update-function-code \
-          --function-name $FUNCTION_NAME \
-          --image-uri 733051452450.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test@$IMAGE_DIGEST
+          --function-name ${{ vars.FUNCTION_NAME }} \
+          --image-uri ${{ vars.ECR_REPO }}@$IMAGE_DIGEST
 
         VERSION=$(aws lambda publish-version \
-          --function-name $FUNCTION_NAME \
+          --function-name ${{ vars.FUNCTION_NAME }} \
           --description 'New deployment' \
           --query 'Version' \
           --output text)
 
         aws lambda update-alias \
-          --function-name $FUNCTION_NAME \
+          --function-name ${{ vars.FUNCTION_NAME }} \
           --function-version "$VERSION" \
           --name main
