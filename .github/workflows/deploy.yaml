@@ -45,7 +45,10 @@ jobs:
 
     - name: Generate tag
       id: generate-tag
-      run: echo "tag=$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
+      run: echo "tag=$(git rev-parse --short HEAD)-$(date +"%Y%m%d-%H%M%S")" >> $GITHUB_OUTPUT
+
+    - name: Generate version file
+      run: echo ${{ steps.generate-tag.outputs.tag }} >> $GITHUB_OUTPUT
 
     - name: Build and push container
       id: build-docker
