@@ -1,6 +1,6 @@
 module.exports = {
   content: [
-    './srv/index.html',
+    './index.tmpl',
   ],
   safelist: [
     'bg-pink',
