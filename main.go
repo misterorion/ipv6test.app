@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"os"
 	"text/template"
 	"time"
 
@@ -18,7 +17,6 @@ var (
 )
 
 func init() {
-	log = zerolog.New(os.Stdout).With().Logger()
 	t, err = template.ParseFiles("index.tmpl")
 	if err != nil {
 		panic(err)
@@ -36,11 +34,10 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 		time.Now().Format("Jan 2, 2006 15:04:05 MST"),
 	}
 
-	log.Info().Msg("hello world")
-
 	log.Info().
 		Str("true-client-ip", data.Ip).
-		Str("user-agent", request.Headers["user-agent"])
+		Str("user-agent", request.Headers["user-agent"]).
+		Send()
 
 	var buf bytes.Buffer
 
