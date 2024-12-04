@@ -3,8 +3,8 @@ name: Build
 on:
   push:
     paths-ignore:
-      - "iac/**"
-      - "README.md"
+      - 'iac/**'
+      - 'README.md'
 
 permissions:
   id-token: write
