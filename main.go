@@ -56,6 +56,7 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 			Str("true-client-ip", request.Headers["true-client-ip"]).
 			Str("user-agent", request.Headers["user-agent"]).
 			Msg("blocked")
+
 		return events.LambdaFunctionURLResponse{
 			StatusCode: 403,
 			Body:       "Forbidden",
