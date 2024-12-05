@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
+	"strings"
 	"text/template"
 	"time"
 
@@ -12,9 +13,17 @@ import (
 )
 
 var (
-	err  error
-	log  zerolog.Logger
-	tmpl *template.Template
+	err              error
+	log              zerolog.Logger
+	tmpl             *template.Template
+	unwantedPrefixes = []string{
+		"/wp-",
+		"/admin",
+		"/cgi-bin",
+		"/.git",
+		"/.env",
+		"//",
+	}
 )
 
 func init() {
@@ -27,7 +36,32 @@ func init() {
 	}
 }
 
+func matchUnwantedPaths(path string) bool {
+	if strings.HasSuffix(path, ".php") {
+		return true
+	}
+
+	for _, prefix := range unwantedPrefixes {
+		if strings.HasPrefix(path, prefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
+	if matchUnwantedPaths(request.RawPath) {
+		log.Info().
+			Str("true-client-ip", request.Headers["true-client-ip"]).
+			Str("user-agent", request.Headers["user-agent"]).
+			Msg("blocked")
+		return events.LambdaFunctionURLResponse{
+			StatusCode: 403,
+			Body:       "Forbidden",
+		}, nil
+	}
+
 	data := struct {
 		Ip       string
 		Hostname string
@@ -38,16 +72,11 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 		time.Now().Format("Jan 2, 2006 15:04:05 MST"),
 	}
 
-	log.Info().
-		Str("true-client-ip", data.Ip).
-		Str("user-agent", request.Headers["user-agent"]).
-		Send()
-
 	var buf bytes.Buffer
 
 	err = tmpl.Execute(&buf, data)
 	if err != nil {
-		log.Error().Err(err).Send()
+		log.Error().Err(err).Msg("error")
 		return events.LambdaFunctionURLResponse{
 			StatusCode: 500,
 			Body:       "Internal server error",
@@ -67,6 +96,11 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 		StatusCode: 200,
 		Body:       buf.String(),
 	}
+
+	log.Info().
+		Str("true-client-ip", request.Headers["true-client-ip"]).
+		Str("user-agent", request.Headers["user-agent"]).
+		Msg("ok")
 
 	return response, nil
 }
