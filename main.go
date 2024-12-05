@@ -53,7 +53,8 @@ func matchUnwantedPaths(path string) bool {
 func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
 	if matchUnwantedPaths(request.RawPath) {
 		log.Info().
-			Str("true-client-ip", request.Headers["true-client-ip"]).
+			Str("ip", request.Headers["true-client-ip"]).
+			Str("path", request.RawPath).
 			Str("user-agent", request.Headers["user-agent"]).
 			Msg("blocked")
 
@@ -99,7 +100,8 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	}
 
 	log.Info().
-		Str("true-client-ip", request.Headers["true-client-ip"]).
+		Str("ip", request.Headers["true-client-ip"]).
+		Str("path", request.RawPath).
 		Str("user-agent", request.Headers["user-agent"]).
 		Msg("ok")
 
