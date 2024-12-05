@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"os"
-	"strings"
+	"regexp"
 	"text/template"
 	"time"
 
@@ -13,16 +13,27 @@ import (
 )
 
 var (
-	err              error
-	log              zerolog.Logger
-	tmpl             *template.Template
-	unwantedPrefixes = []string{
-		"/wp-",
-		"/admin",
-		"/cgi-bin",
-		"/.git",
-		"/.env",
-		"//",
+	err               error
+	log               zerolog.Logger
+	tmpl              *template.Template
+	unwantedPathRegex *regexp.Regexp
+	phpFileRegex      *regexp.Regexp
+	forbiddenResponse = events.LambdaFunctionURLResponse{
+		StatusCode: 403,
+		Body:       "Forbidden",
+	}
+	serverErrorResponse = events.LambdaFunctionURLResponse{
+		StatusCode: 500,
+		Body:       "Internal server error",
+	}
+	responseHeaders = map[string]string{
+		"Content-Type":              "text/html",
+		"Content-Security-Policy":   "script-src 'self'; frame-ancestors 'none'",
+		"Permissions-Policy":        "geolocation=()",
+		"Referrer-Policy":           "no-referrer",
+		"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
+		"X-Content-Type-Options":    "nosniff",
+		"X-XSS-Protection":          "1; mode=block",
 	}
 )
 
@@ -34,34 +45,28 @@ func init() {
 		log.Error().Err(err).Send()
 		os.Exit(1)
 	}
+
+	unwantedPathRegex = regexp.MustCompile(`^(/wp-|/admin|/cgi-bin|/\.git|/\.env|//)`)
+	phpFileRegex = regexp.MustCompile(`\.php$`)
+}
+
+func logRequest(request events.LambdaFunctionURLRequest, message string) {
+	log.Info().
+		Str("ip", request.Headers["true-client-ip"]).
+		Str("path", request.RawPath).
+		Str("user-agent", request.Headers["user-agent"]).
+		Msg(message)
 }
 
 func matchUnwantedPaths(path string) bool {
-	if strings.HasSuffix(path, ".php") {
-		return true
-	}
-
-	for _, prefix := range unwantedPrefixes {
-		if strings.HasPrefix(path, prefix) {
-			return true
-		}
-	}
-
-	return false
+	return phpFileRegex.MatchString(path) || unwantedPathRegex.MatchString(path)
 }
 
 func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
 	if matchUnwantedPaths(request.RawPath) {
-		log.Info().
-			Str("ip", request.Headers["true-client-ip"]).
-			Str("path", request.RawPath).
-			Str("user-agent", request.Headers["user-agent"]).
-			Msg("blocked")
+		logRequest(request, "blocked")
 
-		return events.LambdaFunctionURLResponse{
-			StatusCode: 403,
-			Body:       "Forbidden",
-		}, nil
+		return forbiddenResponse, nil
 	}
 
 	data := struct {
@@ -79,31 +84,16 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	err = tmpl.Execute(&buf, data)
 	if err != nil {
 		log.Error().Err(err).Msg("error")
-		return events.LambdaFunctionURLResponse{
-			StatusCode: 500,
-			Body:       "Internal server error",
-		}, err
+		return serverErrorResponse, err
 	}
 
 	response := events.LambdaFunctionURLResponse{
-		Headers: map[string]string{
-			"Content-Type":              "text/html",
-			"Content-Security-Policy":   "script-src 'self'; frame-ancestors 'none'",
-			"Permissions-Policy":        "geolocation=()",
-			"Referrer-Policy":           "no-referrer",
-			"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
-			"X-Content-Type-Options":    "nosniff",
-			"X-XSS-Protection":          "1; mode=block",
-		},
+		Headers:    responseHeaders,
 		StatusCode: 200,
 		Body:       buf.String(),
 	}
 
-	log.Info().
-		Str("ip", request.Headers["true-client-ip"]).
-		Str("path", request.RawPath).
-		Str("user-agent", request.Headers["user-agent"]).
-		Msg("ok")
+	logRequest(request, "ok")
 
 	return response, nil
 }
