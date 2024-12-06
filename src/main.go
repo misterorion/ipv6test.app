@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"os"
-	"regexp"
 	"text/template"
 	"time"
 
@@ -16,8 +15,6 @@ var (
 	err               error
 	log               zerolog.Logger
 	tmpl              *template.Template
-	unwantedPathRegex *regexp.Regexp
-	phpFileRegex      *regexp.Regexp
 	forbiddenResponse = events.LambdaFunctionURLResponse{
 		StatusCode: 403,
 		Body:       "Forbidden",
@@ -36,9 +33,6 @@ func init() {
 		log.Error().Err(err).Send()
 		os.Exit(1)
 	}
-
-	unwantedPathRegex = regexp.MustCompile(`^(/wp-|/admin|/cgi-bin|/\.git|/\.env|//)`)
-	phpFileRegex = regexp.MustCompile(`\.php$`)
 }
 
 func logRequest(request events.LambdaFunctionURLRequest, message string) {
@@ -49,14 +43,9 @@ func logRequest(request events.LambdaFunctionURLRequest, message string) {
 		Msg(message)
 }
 
-func matchUnwantedPaths(path string) bool {
-	return phpFileRegex.MatchString(path) || unwantedPathRegex.MatchString(path)
-}
-
 func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
-	if matchUnwantedPaths(request.RawPath) {
+	if request.RawPath != "/" {
 		logRequest(request, "blocked")
-
 		return forbiddenResponse, nil
 	}
 
