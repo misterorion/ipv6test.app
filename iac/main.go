@@ -274,7 +274,7 @@ func main() {
 
 		cacheLambdaHeadersPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "cache-lambda-index", &cloudfront.ResponseHeadersPolicyArgs{
 			ResponseHeadersPolicyConfig: &cloudfront.ResponseHeadersPolicyConfigArgs{
-				Comment: pulumi.String("Never cache; set Content-Type; add security headers"),
+				Comment: pulumi.String("Policy for uncached lambda function URLs"),
 				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
 					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
