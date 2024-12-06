@@ -26,15 +26,6 @@ var (
 		StatusCode: 500,
 		Body:       "Internal server error",
 	}
-	responseHeaders = map[string]string{
-		"Content-Type":              "text/html",
-		"Content-Security-Policy":   "script-src 'self'; frame-ancestors 'none'",
-		"Permissions-Policy":        "geolocation=()",
-		"Referrer-Policy":           "no-referrer",
-		"Strict-Transport-Security": "max-age=63072000; includeSubDomains",
-		"X-Content-Type-Options":    "nosniff",
-		"X-XSS-Protection":          "1; mode=block",
-	}
 )
 
 func init() {
@@ -88,7 +79,6 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	}
 
 	response := events.LambdaFunctionURLResponse{
-		Headers:    responseHeaders,
 		StatusCode: 200,
 		Body:       buf.String(),
 	}

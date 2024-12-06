@@ -5,6 +5,7 @@ import (
 
 	"net/url"
 
+	"github.com/pulumi/pulumi-aws-native/sdk/go/aws"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/cloudfront"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/ecr"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/iam"
@@ -24,7 +25,15 @@ const (
 	managedOriginRequestPolicyAllViewerExceptHostHeader = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
 )
 
-var err error
+var (
+	commonTags = aws.TagArray{
+		aws.TagArgs{
+			Key:   pulumi.String("managedBy"),
+			Value: pulumi.String("Pulumi"),
+		},
+	}
+	err error
+)
 
 func newDnsRecord(ctx *pulumi.Context, name string, dns string, zoneId pulumi.StringOutput, domain pulumi.StringOutput, recordType route53.RecordType) error {
 	_, err = route53.NewRecord(ctx, name, &route53.RecordArgs{
@@ -62,7 +71,7 @@ func main() {
 			return err
 		}
 
-		// Lambda
+		// Lambda function
 
 		_, err = ecr.NewRepository(ctx, "ecr-repo", &ecr.RepositoryArgs{
 			EmptyOnDelete: pulumi.Bool(true),
@@ -177,7 +186,7 @@ func main() {
 
 		// CloudFront function
 
-		functionCode, err := os.ReadFile("function-code/true-client-ip.js")
+		functionCode, err := os.ReadFile("cf-function/true-client-ip.js")
 		if err != nil {
 			return err
 		}
@@ -195,7 +204,7 @@ func main() {
 			return err
 		}
 
-		// CloudFront access
+		// CloudFront access controls
 
 		oacS3, err := cloudfront.NewOriginAccessControl(ctx, "s3", &cloudfront.OriginAccessControlArgs{
 			OriginAccessControlConfig: &cloudfront.OriginAccessControlConfigArgs{
@@ -217,6 +226,94 @@ func main() {
 				SigningBehavior:               pulumi.String("always"),
 				SigningProtocol:               pulumi.String("sigv4"),
 				OriginAccessControlOriginType: pulumi.String("lambda"),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		// Response headers policies
+
+		cacheOneDayPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "one-day", &cloudfront.ResponseHeadersPolicyArgs{
+			ResponseHeadersPolicyConfig: &cloudfront.ResponseHeadersPolicyConfigArgs{
+				Comment: pulumi.String("Cache contents for one day"),
+				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
+					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
+						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
+							Header:   pulumi.String("Cache-Control"),
+							Value:    pulumi.String("86400"),
+							Override: pulumi.Bool(false),
+						},
+					},
+				},
+				Name: pulumi.String("cache-one-day"),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		cacheOneWeekPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "one-week", &cloudfront.ResponseHeadersPolicyArgs{
+			ResponseHeadersPolicyConfig: &cloudfront.ResponseHeadersPolicyConfigArgs{
+				Comment: pulumi.String("Cache contents for one week"),
+				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
+					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
+						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
+							Header:   pulumi.String("Cache-Control"),
+							Value:    pulumi.String("604800"),
+							Override: pulumi.Bool(false),
+						},
+					},
+				},
+				Name: pulumi.String("cache-one-week"),
+			},
+		})
+		if err != nil {
+			return err
+		}
+
+		cacheLambdaHeadersPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "cache-never", &cloudfront.ResponseHeadersPolicyArgs{
+			ResponseHeadersPolicyConfig: &cloudfront.ResponseHeadersPolicyConfigArgs{
+				Comment: pulumi.String("Never cache, plus security headers"),
+				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
+					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
+						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
+							Header:   pulumi.String("Content-Type"),
+							Value:    pulumi.String("text/html"),
+							Override: pulumi.Bool(false),
+						},
+						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
+							Header:   pulumi.String("Cache-Control"),
+							Value:    pulumi.String("max-age=0, must-revalidate"),
+							Override: pulumi.Bool(false),
+						},
+					},
+				},
+				Name: pulumi.String("cache-index-page"),
+				SecurityHeadersConfig: &cloudfront.ResponseHeadersPolicySecurityHeadersConfigArgs{
+					ContentSecurityPolicy: &cloudfront.ResponseHeadersPolicyContentSecurityPolicyArgs{
+						ContentSecurityPolicy: pulumi.String("script-src 'self'; frame-ancestors 'none'"),
+						Override:              pulumi.Bool(false),
+					},
+					ContentTypeOptions: &cloudfront.ResponseHeadersPolicyContentTypeOptionsArgs{
+						Override: pulumi.Bool(false),
+					},
+					// FrameOptions: &cloudfront.ResponseHeadersPolicyFrameOptionsArgs{},
+					ReferrerPolicy: &cloudfront.ResponseHeadersPolicyReferrerPolicyArgs{
+						ReferrerPolicy: pulumi.String("no-referrer"),
+						Override:       pulumi.Bool(false),
+					},
+					StrictTransportSecurity: &cloudfront.ResponseHeadersPolicyStrictTransportSecurityArgs{
+						AccessControlMaxAgeSec: pulumi.Int(63072000),
+						IncludeSubdomains:      pulumi.Bool(true),
+						Override:               pulumi.Bool(false),
+					},
+					XssProtection: &cloudfront.ResponseHeadersPolicyXssProtectionArgs{
+						ModeBlock:  pulumi.Bool(true),
+						Override:   pulumi.Bool(false),
+						Protection: pulumi.Bool(true),
+					},
+				},
 			},
 		})
 		if err != nil {
@@ -256,11 +353,90 @@ func main() {
 						},
 					),
 					CacheBehaviors: cloudfront.DistributionCacheBehaviorArray{
-						plausibleApiCacheBehavior,
-						plausibleScriptCacheBehavior,
-						assetsCacheBehavior,
-						faviconCacheBehavior,
-						robotsCacheBehavior,
+						&cloudfront.DistributionCacheBehaviorArgs{
+							AllowedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+								pulumi.String("OPTIONS"),
+								pulumi.String("POST"),
+								pulumi.String("PUT"),
+								pulumi.String("PATCH"),
+								pulumi.String("DELETE"),
+							},
+							CachedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachePolicyId:         pulumi.String(managedCachingDisabledPolicyId),
+							OriginRequestPolicyId: pulumi.String(managedOriginRequestPolicyUserAgentRefererHeaders),
+							ViewerProtocolPolicy:  pulumi.String("https-only"),
+							PathPattern:           pulumi.String("/api/event"),
+							TargetOriginId:        pulumi.String("plausible.io"),
+							Compress:              pulumi.Bool(true),
+						},
+						&cloudfront.DistributionCacheBehaviorArgs{
+							AllowedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachePolicyId:        pulumi.String(managedCachingOptimizedPolicyId),
+							ViewerProtocolPolicy: pulumi.String("redirect-to-https"),
+							PathPattern:          pulumi.String("/js/script.js"),
+							TargetOriginId:       pulumi.String("plausible.io"),
+							Compress:             pulumi.Bool(true),
+						},
+						&cloudfront.DistributionCacheBehaviorArgs{
+							AllowedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachePolicyId:           pulumi.String(managedCachingOptimizedPolicyId),
+							ViewerProtocolPolicy:    pulumi.String("redirect-to-https"),
+							PathPattern:             pulumi.String("/assets/*"),
+							TargetOriginId:          pulumi.String("S3"),
+							Compress:                pulumi.Bool(true),
+							ResponseHeadersPolicyId: cacheOneDayPolicy.ID(),
+						},
+						&cloudfront.DistributionCacheBehaviorArgs{
+							AllowedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachePolicyId:           pulumi.String(managedCachingOptimizedPolicyId),
+							ViewerProtocolPolicy:    pulumi.String("redirect-to-https"),
+							PathPattern:             pulumi.String("/favicon.ico"),
+							TargetOriginId:          pulumi.String("S3"),
+							Compress:                pulumi.Bool(true),
+							ResponseHeadersPolicyId: cacheOneDayPolicy.ID(),
+						},
+						&cloudfront.DistributionCacheBehaviorArgs{
+							AllowedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachedMethods: pulumi.StringArray{
+								pulumi.String("HEAD"),
+								pulumi.String("GET"),
+							},
+							CachePolicyId:           pulumi.String(managedCachingOptimizedPolicyId),
+							ViewerProtocolPolicy:    pulumi.String("redirect-to-https"),
+							PathPattern:             pulumi.String("/robots.txt"),
+							TargetOriginId:          pulumi.String("S3"),
+							Compress:                pulumi.Bool(true),
+							ResponseHeadersPolicyId: cacheOneWeekPolicy.ID(),
+						},
 					},
 					Comment: pulumi.String(distributionConfig.dns),
 					DefaultCacheBehavior: &cloudfront.DistributionDefaultCacheBehaviorArgs{
@@ -272,11 +448,12 @@ func main() {
 							pulumi.String("HEAD"),
 							pulumi.String("GET"),
 						},
-						CachePolicyId:         pulumi.String(managedCachingDisabledPolicyId),
-						Compress:              pulumi.Bool(true),
-						OriginRequestPolicyId: pulumi.String(managedOriginRequestPolicyAllViewerExceptHostHeader),
-						ViewerProtocolPolicy:  pulumi.String("allow-all"),
-						TargetOriginId:        pulumi.String("lambda"),
+						CachePolicyId:           pulumi.String(managedCachingDisabledPolicyId),
+						Compress:                pulumi.Bool(true),
+						OriginRequestPolicyId:   pulumi.String(managedOriginRequestPolicyAllViewerExceptHostHeader),
+						ViewerProtocolPolicy:    pulumi.String("allow-all"),
+						TargetOriginId:          pulumi.String("lambda"),
+						ResponseHeadersPolicyId: cacheLambdaHeadersPolicy.ID(),
 						FunctionAssociations: cloudfront.DistributionFunctionAssociationArray{
 							cloudfront.DistributionFunctionAssociationArgs{
 								EventType:   pulumi.String("viewer-request"),
@@ -288,7 +465,22 @@ func main() {
 					HttpVersion: pulumi.String("http2and3"),
 					Ipv6Enabled: pulumi.Bool(true),
 					Origins: &cloudfront.DistributionOriginArray{
-						plausibleOrigin,
+						&cloudfront.DistributionOriginArgs{
+							ConnectionAttempts: pulumi.Int(3),
+							ConnectionTimeout:  pulumi.Int(10),
+							DomainName:         pulumi.String("plausible.io"),
+							Id:                 pulumi.String("plausible.io"),
+							CustomOriginConfig: &cloudfront.DistributionCustomOriginConfigArgs{
+								HttpPort:               pulumi.Int(80),
+								HttpsPort:              pulumi.Int(443),
+								OriginKeepaliveTimeout: pulumi.Int(5),
+								OriginProtocolPolicy:   pulumi.String("https-only"),
+								OriginReadTimeout:      pulumi.Int(30),
+								OriginSslProtocols: pulumi.StringArray{
+									pulumi.String("TLSv1.2"),
+								},
+							},
+						},
 						&cloudfront.DistributionOriginArgs{
 							ConnectionAttempts:    pulumi.Int(3),
 							ConnectionTimeout:     pulumi.Int(10),
