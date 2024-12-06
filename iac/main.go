@@ -272,9 +272,9 @@ func main() {
 			return err
 		}
 
-		cacheLambdaHeadersPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "cache-never", &cloudfront.ResponseHeadersPolicyArgs{
+		cacheLambdaHeadersPolicy, err := cloudfront.NewResponseHeadersPolicy(ctx, "cache-lambda-index", &cloudfront.ResponseHeadersPolicyArgs{
 			ResponseHeadersPolicyConfig: &cloudfront.ResponseHeadersPolicyConfigArgs{
-				Comment: pulumi.String("Never cache, plus security headers"),
+				Comment: pulumi.String("Never cache; set Content-Type; add security headers"),
 				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
 					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
@@ -284,12 +284,17 @@ func main() {
 						},
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
 							Header:   pulumi.String("Cache-Control"),
-							Value:    pulumi.String("max-age=0, must-revalidate"),
+							Value:    pulumi.String("max-age=0, must-revalidate, private"),
+							Override: pulumi.Bool(false),
+						},
+						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
+							Header:   pulumi.String("Permissions-Policy"),
+							Value:    pulumi.String("geolocation=()"),
 							Override: pulumi.Bool(false),
 						},
 					},
 				},
-				Name: pulumi.String("cache-index-page"),
+				Name: pulumi.String("lambda-index-page"),
 				SecurityHeadersConfig: &cloudfront.ResponseHeadersPolicySecurityHeadersConfigArgs{
 					ContentSecurityPolicy: &cloudfront.ResponseHeadersPolicyContentSecurityPolicyArgs{
 						ContentSecurityPolicy: pulumi.String("script-src 'self'; frame-ancestors 'none'"),
