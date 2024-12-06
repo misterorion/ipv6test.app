@@ -7,25 +7,13 @@ async function handler(event) {
 
   const ALLOWED_PATHS = ["/", "/ip"];
 
-  // Handle IP request for CLI tools or explicit /ip path
-  if (isCliTool || uri === "/ip") {
-    return {
-      statusCode: 200,
-      body: clientIP,
-      headers: {
-        "content-type": { value: "text/plain; charset=UTF-8" },
-        "cache-control": { value: "no-store" },
-      },
-    };
-  }
-
   // Restrict access to allowed paths
   if (!ALLOWED_PATHS.includes(uri)) {
     return {
       statusCode: 403,
       body: "Access Forbidden",
       headers: {
-        "content-type": { value: "text/plain; charset=UTF-8" },
+        "content-type": { value: "text/plain" },
         "cache-control": { value: "no-store" },
       },
     };
@@ -33,6 +21,18 @@ async function handler(event) {
   request.headers["true-client-ip"] = {
     value: clientIP,
   };
+
+  // Handle IP request for CLI tools or explicit /ip path
+  if (isCliTool || uri === "/ip") {
+    return {
+      statusCode: 200,
+      body: clientIP,
+      headers: {
+        "content-type": { value: "text/plain" },
+        "cache-control": { value: "no-store" },
+      },
+    };
+  }
 
   return request;
 }
