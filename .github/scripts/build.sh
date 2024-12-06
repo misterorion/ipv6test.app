@@ -7,7 +7,7 @@ set -e
 npm ci
 npm run build
 
-aws s3 sync ./dist s3://"$S3_BUCKET" --delete
+aws s3 sync ./static s3://"$S3_BUCKET" --delete
 
 # 2. Build and push Lambda container image
 
