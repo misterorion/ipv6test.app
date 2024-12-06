@@ -303,7 +303,6 @@ func main() {
 					ContentTypeOptions: &cloudfront.ResponseHeadersPolicyContentTypeOptionsArgs{
 						Override: pulumi.Bool(false),
 					},
-					// FrameOptions: &cloudfront.ResponseHeadersPolicyFrameOptionsArgs{},
 					ReferrerPolicy: &cloudfront.ResponseHeadersPolicyReferrerPolicyArgs{
 						ReferrerPolicy: pulumi.String("no-referrer"),
 						Override:       pulumi.Bool(false),
