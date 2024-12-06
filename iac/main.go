@@ -280,7 +280,7 @@ func main() {
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
 							Header:   pulumi.String("Content-Type"),
 							Value:    pulumi.String("text/html"),
-							Override: pulumi.Bool(false),
+							Override: pulumi.Bool(true),
 						},
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
 							Header:   pulumi.String("Cache-Control"),
