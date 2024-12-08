@@ -70,7 +70,7 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	response := events.LambdaFunctionURLResponse{
 		Body: buf.String(),
 		Headers: map[string]string{
-			"Content-Encoding": "text/html",
+			"Content-Type": "text/html",
 		},
 		StatusCode: 200,
 	}
