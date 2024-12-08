@@ -68,8 +68,11 @@ func handler(request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLR
 	}
 
 	response := events.LambdaFunctionURLResponse{
+		Body: buf.String(),
+		Headers: map[string]string{
+			"Content-Encoding": "text/html",
+		},
 		StatusCode: 200,
-		Body:       buf.String(),
 	}
 
 	logRequest(request, "ok")
