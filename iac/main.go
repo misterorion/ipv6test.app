@@ -278,11 +278,6 @@ func main() {
 				CustomHeadersConfig: &cloudfront.ResponseHeadersPolicyCustomHeadersConfigArgs{
 					Items: &cloudfront.ResponseHeadersPolicyCustomHeaderArray{
 						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
-							Header:   pulumi.String("Content-Type"),
-							Value:    pulumi.String("text/html"),
-							Override: pulumi.Bool(true),
-						},
-						cloudfront.ResponseHeadersPolicyCustomHeaderArgs{
 							Header:   pulumi.String("Cache-Control"),
 							Value:    pulumi.String("max-age=0, must-revalidate, private"),
 							Override: pulumi.Bool(false),
