@@ -36,9 +36,10 @@ func init() {
 }
 
 func logRequest(request events.LambdaFunctionURLRequest, message string) {
+	log.Println(request)
 	log.Info().
 		Str("ip", request.Headers["true-client-ip"]).
-		Str("Country", request.Headers["CloudFront-Viewer-Country"]).
+		Str("Country", request.Headers["cloudFront-viewer-country"]).
 		Str("path", request.RawPath).
 		Str("user-agent", request.Headers["user-agent"]).
 		Msg(message)
