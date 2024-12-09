@@ -38,8 +38,8 @@ func init() {
 func logRequest(request events.LambdaFunctionURLRequest, message string) {
 	log.Info().
 		Str("ip", request.Headers["true-client-ip"]).
-		Str("Country", request.Headers["cloudfront-viewer-country"]).
-		Str("City", request.Headers["cloudfront-viewer-city"]).
+		Str("country", request.Headers["cloudfront-viewer-country"]).
+		Str("city", request.Headers["cloudfront-viewer-city"]).
 		Str("user-agent", request.Headers["user-agent"]).
 		Msg(message)
 }
