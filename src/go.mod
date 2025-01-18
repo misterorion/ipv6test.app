@@ -1,4 +1,4 @@
-module ipv6teste
+module ipv6test
 
 go 1.23.2
 
