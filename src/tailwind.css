@@ -75,7 +75,7 @@
     @apply pt-2 pb-3 text-center font-bold align-middle;
   }
   #ip {
-    @apply text-center py-5 text-xs sm:text-xl lg:text-3xl text-black font-mono;
+    @apply text-center py-5 text-xs sm:text-xl lg:text-3xl font-bold font-mono;
   }
   h3 {
     @apply text-center max-w-xs md:max-w-full mx-auto text-2xl font-bold py-5;
