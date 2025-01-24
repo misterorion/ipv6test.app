@@ -45,7 +45,7 @@
     font-family: 'Noto Sans', sans-serif;
   }
   .monospace {
-    font-family: 'Cascadia', 'Courier New', Courier, font-mono;
+    font-family: 'Cascadia', 'Courier New', Courier, monospace;
   }
   .main {
     @apply mx-2 sm:mx-4 md:mx-auto md:max-w-2xl lg:max-w-4xl pt-2 pb-6 sm:py-6 px-4 sm:px-16 md:px-20 bg-white my-4 border-4 rounded-xl;
@@ -75,7 +75,7 @@
     @apply pt-2 pb-3 text-center font-bold align-middle;
   }
   #ip {
-    @apply text-center py-5 text-xs sm:text-xl lg:text-3xl font-bold font-mono;
+    @apply text-center py-5 text-xs sm:text-xl lg:text-3xl font-bold font-mono text-black;
   }
   h3 {
     @apply text-center max-w-xs md:max-w-full mx-auto text-2xl font-bold py-5;
