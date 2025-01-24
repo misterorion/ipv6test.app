@@ -1,101 +1,123 @@
-@tailwind base;
-@tailwind components;
-@font-face {
-  font-family: "Cascadia";
-  src: url("./CascadiaCode-SemiBold.woff2");
-  font-display: block;
-  font-weight: 600;
+@import 'tailwindcss';
+
+@config '../tailwind.config.js';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
 }
-@font-face {
-  font-family: "Noto Sans";
-  src: url("./Noto-Sans-400.woff2");
-  font-display: block;
-  font-weight: 400;
+
+@layer components {
+  @font-face {
+    font-family: 'Cascadia';
+    src: url('./CascadiaCode-SemiBold.woff2');
+    font-display: block;
+    font-weight: 600;
+  }
+  @font-face {
+    font-family: 'Noto Sans';
+    src: url('./Noto-Sans-400.woff2');
+    font-display: block;
+    font-weight: 400;
+  }
+  @font-face {
+    font-family: 'Noto Sans';
+    src: url('./Noto-Sans-700.woff2');
+    font-display: block;
+    font-weight: 700;
+  }
+  body {
+    background: url('./bg.svg');
+    @apply bg-center bg-no-repeat bg-cover bg-fixed;
+    font-family: 'Noto Sans', sans-serif;
+  }
+  .monospace {
+    font-family: 'Cascadia', 'Courier New', Courier, font-mono;
+  }
+  .main {
+    @apply mx-2 sm:mx-4 md:mx-auto md:max-w-2xl lg:max-w-4xl pt-2 pb-6 sm:py-6 px-4 sm:px-16 md:px-20 bg-white my-4 border-4 rounded-xl;
+  }
+  .logo {
+    @apply mx-auto;
+  }
+  .logo img {
+    @apply w-1/2 md:w-1/3;
+  }
+  .nav {
+    @apply flex flex-col sm:flex-row pt-0 pb-3 md:py-5 justify-center sm:space-x-4 font-bold text-center sticky top-0 bg-white/90;
+  }
+  .nav a {
+    @apply sm:w-1/3 py-3 mt-2 md:mt-0 rounded-xl bg-gray-100 hover:bg-purple-200 border-2 border-purple-400;
+  }
+  .nav a.btn-active {
+    @apply bg-purple-200;
+  }
+  #emoji {
+    @apply text-8xl h-32 sm:h-48 md:h-64 flex items-center justify-center;
+  }
+  #ip-report {
+    @apply border-4 rounded-xl p-0 mb-8;
+  }
+  #ip-report-title {
+    @apply pt-2 pb-3 text-center font-bold align-middle;
+  }
+  #ip {
+    @apply text-center py-5 text-xs sm:text-xl lg:text-3xl text-black font-mono;
+  }
+  h3 {
+    @apply text-center max-w-xs md:max-w-full mx-auto text-2xl font-bold py-5;
+  }
+  p {
+    @apply font-normal mb-4 text-base md:text-lg;
+  }
+  .cmd-container {
+    @apply border-4 border-gray-300 rounded-xl p-0 mb-8;
+  }
+  .cmd-container__title {
+    @apply font-semibold bg-gray-300 text-center pt-1 pb-2 align-middle;
+  }
+  .cmd-container__cmd {
+    @apply font-semibold text-center py-2 font-mono text-base sm:text-2xl;
+  }
+  footer {
+    @apply text-sm text-center border-t border-gray-200 pt-5 mt-2;
+  }
+  footer a,
+  img {
+    @apply inline-block;
+  }
+  .icon {
+    @apply mx-auto mt-5 mb-3 px-2;
+  }
+  .bg-pink {
+    @apply bg-pink-700;
+  }
+  .border-pink {
+    @apply border-pink-700;
+  }
+  .bg-purple {
+    @apply bg-purple-700;
+  }
+  .border-purple {
+    @apply border-purple-700;
+  }
+  .bg-yellow {
+    @apply bg-yellow-400;
+  }
+  .border-yellow {
+    @apply border-yellow-400;
+  }
 }
-@font-face {
-  font-family: "Noto Sans";
-  src: url("./Noto-Sans-700.woff2");
-  font-display: block;
-  font-weight: 700;
-}
-body {
-  background: url("./bg.svg");
-  @apply bg-center bg-no-repeat bg-cover bg-fixed;
-  font-family: "Noto Sans", sans-serif;
-}
-.monospace {
-  font-family: "Cascadia", "Courier New", Courier, monospace;
-}
-.main {
-  @apply mx-2 sm:mx-4 md:mx-auto md:max-w-2xl lg:max-w-4xl pt-2 pb-6 sm:py-6 px-4 sm:px-16 md:px-20 bg-white my-4 border-4 rounded-xl;
-}
-.logo {
-  @apply mx-auto;
-}
-.logo img {
-  @apply w-1/2 md:w-1/3;
-}
-.nav {
-  @apply flex flex-col sm:flex-row pt-0 pb-3 md:py-5 justify-center sm:space-x-4 font-bold text-center sticky top-0 bg-white bg-opacity-90;
-}
-.nav a {
-  @apply sm:w-1/3 py-3 mt-2 md:mt-0 rounded-xl bg-gray-100 hover:bg-purple-200 border-2 border-purple-400;
-}
-.nav a.btn-active {
-  @apply bg-purple-200;
-}
-#emoji {
-  @apply text-8xl h-32 sm:h-48 md:h-64 flex items-center justify-center;
-}
-#ip-report {
-  @apply border-4 rounded-xl p-0 mb-8;
-}
-#ip-report-title {
-  @apply pt-2 pb-3 text-center font-bold align-middle;
-}
-#ip {
-  @apply text-center py-5 text-xs sm:text-xl lg:text-3xl text-black monospace;
-}
-h3 {
-  @apply text-center max-w-xs md:max-w-full mx-auto text-2xl font-bold py-5;
-}
-p {
-  @apply font-normal mb-4 text-base md:text-lg;
-}
-.cmd-container {
-  @apply border-4 border-gray-300 rounded-xl p-0 mb-8;
-}
-.cmd-container__title {
-  @apply font-semibold bg-gray-300 text-center pt-1 pb-2 align-middle;
-}
-.cmd-container__cmd {
-  @apply font-semibold text-center py-2 monospace text-base sm:text-2xl;
-}
-footer {
-  @apply text-sm text-center border-t border-gray-200 pt-5 mt-2;
-}
-footer a,img {
-  @apply inline-block;
-}
-.icon {
-  @apply mx-auto mt-5 mb-3 px-2;
-}
-.bg-pink {
-  @apply bg-pink-700;
-}
-.border-pink {
-  @apply border-pink-700;
-}
-.bg-purple {
-  @apply bg-purple-700;
-}
-.border-purple {
-  @apply border-purple-700;
-}
-.bg-yellow {
-  @apply bg-yellow-400;
-}
-.border-yellow {
-  @apply border-yellow-400;
-}
-@tailwind utilities;
