@@ -21,7 +21,7 @@ docker buildx build . \
     --push \
     --provenance=false
 
-# 3. Update Lambda function code, create version, and assign alias
+# 3. Update Lambda function code
 
 SHA_256=$(aws ecr describe-images \
             --repository-name lambda/ipv6test \
@@ -62,6 +62,8 @@ aws lambda update-function-code \
 
 wait_for_status 'Function code update' || exit 1
 
+# 4. Create version
+
 VERSION=$(aws lambda publish-version \
             --function-name "$FUNCTION_NAME" \
             --description "New deployment" \
@@ -69,6 +71,8 @@ VERSION=$(aws lambda publish-version \
             --output text)
 
 wait_for_status "Version $VERSION" || exit 1
+
+# 5. Assign alias
 
 aws lambda update-alias \
     --function-name "$FUNCTION_NAME" \
