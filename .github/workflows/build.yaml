@@ -22,9 +22,9 @@ jobs:
       #     role-to-assume: ${{ secrets.IAM_ROLE }}
       #     aws-region: us-east-2
 
-      - name: Login to ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+      # - name: Login to ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4
