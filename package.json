@@ -8,11 +8,11 @@
     "build": "npm run minifyJS && npm run buildCSS"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.0.0",
+    "@tailwindcss/postcss": "^4.0.8",
     "cssnano": "^7.0.6",
-    "postcss": "^8.5.1",
+    "postcss": "^8.5.3",
     "postcss-cli": "^11.0.0",
-    "tailwindcss": "^4.0.0",
+    "tailwindcss": "^4.0.8",
     "uglify-js": "^3.19.3"
   }
 }
