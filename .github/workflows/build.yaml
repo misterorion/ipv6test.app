@@ -23,4 +23,4 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Deploy
-        run: ./.github/scripts/build.sh
+        run: ./.github/scripts/build-and-deploy.sh
