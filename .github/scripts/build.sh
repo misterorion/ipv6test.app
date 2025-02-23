@@ -63,22 +63,22 @@ wait_for_status() {
 
         case "$current_status" in
             "Successful")
-                log "$description successful"
+                echo "$description successful"
                 return 0
                 ;;
             "Failed")
-                log "$description failed"
+                echo "$description failed"
                 return 1
                 ;;
             *)
-                log "Waiting for $description (attempt $((attempt+1))/$max_attempts, status: ${current_status:-unknown})"
+                echo "Waiting for $description (attempt $((attempt+1))/$max_attempts, status: ${current_status:-unknown})"
                 sleep $wait_time
                 ((attempt++))
                 ;;
         esac
     done
 
-    log "Timeout waiting for $description after $((max_attempts * wait_time)) seconds"
+    echo "Timeout waiting for $description after $((max_attempts * wait_time)) seconds"
     return 1
 }
 
