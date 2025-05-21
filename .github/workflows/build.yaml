@@ -6,21 +6,30 @@ on:
       - 'iac/**'
       - 'README.md'
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   build:
-    runs-on: codebuild-ipv6test-app-${{ github.run_id }}-${{ github.run_attempt }}
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          node-version: "22.x"
+          aws-region: us-east-2
+          role-to-assume: ${{ secrets.ACTIONS_ROLE_ARN }}
 
       - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build and Deploy
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+          FUNCTION_NAME: ipv6test
         run: ./.github/scripts/build-and-deploy.sh
