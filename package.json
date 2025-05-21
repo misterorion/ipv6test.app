@@ -1,0 +1,18 @@
+{
+  "name": "ipv6test",
+  "author": "Orion Anderson <orion@mechapower.com>",
+  "license": "MIT",
+  "scripts": {
+    "minifyJS": "uglifyjs src/confetti.js src/report.js -c -m -o static/assets/scripts.min.js",
+    "buildCSS": "postcss src/tailwind.css -o static/assets/styles.min.css",
+    "build": "npm run minifyJS && npm run buildCSS"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.7",
+    "cssnano": "^7.0.7",
+    "postcss": "^8.5.3",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.1.7",
+    "uglify-js": "^3.19.3"
+  }
+}

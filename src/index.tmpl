@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Primary Meta Tags -->
+  {{- if eq .Hostname "v4.ipv6test.app" }}
+  <title>IPv4-Only Test Page</title>
+  {{- else if eq .Hostname "v6.ipv6test.app" }}
+  <title>IPv6-Only Test Page</title>
+  {{- else}}
+  <title>Dualstack IPv6/IPv4 Test Page</title>
+  {{ end -}}
+  <meta name="title" content="Dualstack IPv6/IPv4 Test Page">
+  <meta name="description" content="Is your network ready for IPv6? Test your connectivity against a dualstack load balancer through the web or command line.">
+  <!-- Open Graph / Facebook -->
+  <meta property="og:title" content="Dualstack IPv6/IPv4 Test Page">
+  <meta name="author" property="og:author" content="Orion Anderson">
+  <meta property="og:description" content="Is your network ready for IPv6? Test your connectivity against a dualstack load balancer through the web or command line.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://ipv6test.app/assets/card.png">
+  <!-- Twitter -->
+  <meta property="twitter:title" content="Dualstack IPv6/IPv4 Test Page">
+  <meta property="twitter:creator" content="@misterorion">
+  <meta property="twitter:description" content="Is your network ready for IPv6? Test your connectivity against a dualstack load balancer through the web or command line.">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:image" content="https://ipv6test.app/assets/card.png">
+  <link rel="stylesheet" type="text/css" href="/assets/styles.min.css">
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon-16x16.png">
+  <link rel="manifest" href="/assets/site.webmanifest">
+  {{- if eq .Hostname "v4.ipv6test.app" }}
+  <link rel="canonical" href="https://v4.ipv6test.app">
+  {{- else if eq .Hostname "v6.ipv6test.app" }}
+  <link rel="canonical" href="https://v6.ipv6test.app">
+  {{- else }}
+  <link rel="canonical" href="https://ipv6test.app">
+  {{ end }}
+  <script defer data-domain="ipv6test.app" data-api="/api/event" src="/js/script.js"></script>
+  <!--
+
+    Hi there!
+
+             /\_/\
+        ____/ o o \
+      /~____  =ø= /
+    (______)__m_m)
+
+  -->
+</head>
+<body>
+  <header class="text-center">
+    <div class="logo">
+      <a href="/">
+        <img src="/assets/ipv6test.svg" alt="ipv6test">
+      </a>
+    </div>
+  </header>
+  <div class="main">
+    <nav class="nav">
+      {{- if eq .Hostname "v4.ipv6test.app" }}
+      <a href="https://ipv6test.app/">Dualstack Page</a>
+      <a href="https://v6.ipv6test.app/">IPv6-Only Page</a>
+      <a href="https://v4.ipv6test.app/" class="btn-active">IPv4-Only Page</a>
+      {{- else if eq .Hostname "v6.ipv6test.app" }}
+      <a href="https://ipv6test.app/">Dualstack Page</a>
+      <a href="https://v6.ipv6test.app/" class="btn-active">IPv6-Only Page</a>
+      <a href="https://v4.ipv6test.app/">IPv4-Only Page</a>
+      {{- else }}
+      <a href="https://ipv6test.app/" class="btn-active">Dualstack Page</a>
+      <a href="https://v6.ipv6test.app/">IPv6-Only Page</a>
+      <a href="https://v4.ipv6test.app/">IPv4-Only Page</a>
+      {{ end -}}
+    </nav>
+    <section>
+      <div id="emoji"></div>
+      <h3 id="message"></h3>
+      <div id="ip-report">
+        <div id="ip-report-title">
+          Your IP Address
+        </div>
+        <div id="ip">
+          {{ .Ip }}
+        </div>
+      </div>
+      <div id="wall-of-text">
+        {{- if eq .Hostname "v4.ipv6test.app" -}}
+        <p>
+          The domain serving this page uses a DNS A record assigned to an IPv4 address.
+          This means this page is only viewable over IPv4.
+        </p>
+        <p>
+          If your ISP hasn't turned on IPv6 in your area and you want IPv6, let them
+          know! IPv6 offers several benefits compared to IPv4, including more efficient
+          packet routing, simplified network configuration via SLAAC, and better
+          security via baked-in IPSEC.
+        </p>
+        {{- else if eq .Hostname "v6.ipv6test.app" -}}
+        <p>
+          The domain serving this page uses a DNS AAAA record assigned to an IPv6
+          address. This means this page is only routable over IPv6. If you can see this
+          page, your ISP can route traffic to this server over IPv6 and your web browser
+          prefers IPv6.
+        </p>
+        {{- else }}
+        <p>
+          The domain serving this page uses a dualstack CDN that has both IPv4 and IPv6
+          addresses. If you see an IPv6 address above, your ISP can route traffic to
+          this server over IPv6 and your web browser prefers IPv6. If you see an IPv4
+          address above it means either your ISP can't route IPv6 traffic, or your
+          browser prefers IPv4.
+        </p>
+        <p>
+          If your ISP hasn't turned on IPv6 in your area and you want IPv6, let them
+          know! IPv6 offers several benefits compared to IPv4, including more efficient
+          packet routing, simplified network configuration via SLAAC, and better
+          security via baked-in IPSEC.
+        </p>
+        <p>
+          If your browser prefers IPv4 and you know IPv6 is enabled and working on your
+          network, a connection reset may help. A browser may get stuck preferring IPv4
+          if it loads a page before your device is assigned an IPv6 address by your
+          router, or you recently moved from an IPv4-only network to an IPv6-enabled
+          network. Close your browser, then disconnect and reconnect your device to the
+          network. Wait a bit for the IPv6 auto-configuration to take place before
+          opening your browser again.
+        </p>
+        {{- end }}
+      </div>
+    </section>
+    <section>
+      <h3>Get your IP from the command line!</h3>
+      <div class="cmd-container">
+        <div class="cmd-container__title">
+          cURL
+        </div>
+        <div class="cmd-container__cmd">
+          curl {{ .Hostname }}
+        </div>
+      </div>
+      <div class="cmd-container">
+        <div class="cmd-container__title">
+          HTTPie
+        </div>
+        <div class="cmd-container__cmd">
+          http -b {{ .Hostname }}
+        </div>
+      </div>
+      <div class="cmd-container">
+        <div class="cmd-container__title">
+          Wget
+        </div>
+        <div class="cmd-container__cmd">
+          wget -qO- {{ .Hostname }}
+        </div>
+      </div>
+      <div class="cmd-container">
+        <div class="cmd-container__title">
+          Plain output (any User-Agent)
+        </div>
+        <div class="cmd-container__cmd">
+          http://{{ .Hostname }}/ip
+        </div>
+      </div>
+    </section>
+    <footer>
+      <div>
+        Page generated on: {{ .Date }}
+      </div>
+    </footer>
+  </div>
+  <script src="/assets/scripts.min.js"></script>
+</body>
+</html>
