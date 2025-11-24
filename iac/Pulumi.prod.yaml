@@ -1,15 +1,16 @@
 encryptionsalt: v1:9/yGWkQ9s+c=:v1:faOn9xsniu5EEn7A:VpamD9AQHG+HashyDL6Gz5fSRtT47Q==
 config:
-  aws-native:region: us-east-2
   ipv6test:account-id:
-    secure: v1:X3p0EOdLJCJ8wPBY:+raVq+VLaysNLY7yVAZFwM8wR4whfWOQtWMxHw==
-  ipv6test:bucket-name:
-    secure: v1:Ly/M1A4vZZVZ8ngK:mfW+ISSHTl5CoxBm8Rf7KUfJSZdWHYZPFi3iQVy6E8KAFCcW3w==
+    secure: v1:E99IV3MXfTj4rL5e:bTmsYvh9fhox5QF60GAkDpcP+I5SFqnkehAdGA==
   ipv6test:certArn-ipv6test.app:
-    secure: v1:DWLB0kxm8ffmxbbM:yGk4bEqkQWg8gfM1Ia4WTN1I05RkPEvBmH3dCZeAbV1hl6pgu/ejQu3AQa4GJ6E4o1JCt2QvHIgMvkuYZm+eAlsKUdcJq/FQFDVVjjr9IYYiU20RQ181LcICrqG72ZyQ6hsD
+    secure: v1:EHunOsqjD8jUxdQy:s5rVGehEXbyNF8O0rL1ZOBeiy2QnEwSc4ZevkG52nLIWJUPnGzeYQ+Rma6o3WdcE+UaQDz7UzrTPNCmo53bqzT9X0Huf6IhFc+loWfoUZubUg4CLxs77Ae4A3YE1LNO/flP5
   ipv6test:certArn-v4.ipv6test.app:
-    secure: v1:Pcp/S7mV19LVwIvP:MRl1uX87PybicMrFTeFG9q6MSwEI/NukDI47zA5mV+qMDyZIfUrWDubaBxG2k/RZVqNz9M9HwFGXM3co8+3K5sDSAzugT0pWuz2BDzuoMUoGADdiIMg8bGupiHYlu1c2Ri0L
+    secure: v1:uKaDliQqmkR5R7A+:zcWpfUzkGdxZMHV7E8/KfCAxxvbhl+yLaxXDIMcr1G/ShP/+RJU2qGNzobbzqGC6VpMOP1IQqOg4IaKIZD/q0Y0TXWxV8eqUc2crJcRJgwiWPLK3s2ovQ+OC1wAA6BNeKFiE
   ipv6test:certArn-v6.ipv6test.app:
-    secure: v1:Srp6RSUcOl8yrF4o:cclQc/fOWB5SSpWMfGe8tOOsbIN65L8YA5ZVu65XWENEI0QD3KOKMJEis6cy4SukkVwDdVcpe6Bd+gq6SXahoh+dGocr9Jl2L5OdO0+/a/tBEnpl6iYtlyhlF/WdRbS3g/nM
+    secure: v1:rSBd9yuCbDOVYWl/:8Es3feRJhVQ9lm4lfBwvBMYb94Wn3M+bQIT44iSjNpuuDHQ/FuzeGQ0rYBen9K0dxnT+xUyXMCgSo7zrS6L0tPj7j9Cb4sunb23Rhc2ws77zBsHIi65E6tDkxVzUwZ5//mra
   ipv6test:route53-zone-id:
     secure: v1:ABJmRTfrJWjPjAeY:h70vKMFFTJ5BHZvKBEf3MZRhwuuzqk3xuNZ/SpdTtvTWZ3u/Jg==
+  ipv6test:bucket-regional-domain-name:
+    secure: v1:hWKEZDCxtYu9iV+O:2RshNJogVA3FXd0XnpMEvGSI6VtVTtPyD1/5lDB/ARW16C0dhO0fIJTDFRiA/ukwpyiuLXSFC9qDHR8u
+  ipv6test:web-acl-id:
+    secure: v1:qd1DJy3jPfdW1TOo:WXnirdgKbUMuonrJxGb7xeyH+clY0wRMC+E43+W4cjspLM3MTFQAITtEeF5p3dkKR04nj1n71IMMLgKAJ0K3sXF+TP4W1xquO/jO1xyLnaQHC3JDGApd49Kur96KtzCHMqxkS2BL0jeYfdv9
