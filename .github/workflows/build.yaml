@@ -1,7 +1,7 @@
 name: Build
 
 # This is a demo repository so ensure this workflow never runs
-# on:
+on: {}
 #   push:
 #     paths-ignore:
 #       - 'iac/**'
