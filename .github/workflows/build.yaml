@@ -1,11 +1,12 @@
 name: Build
 
-# This is a demo repository so ensure this workflow never runs
-on: {}
-#   push:
-#     paths-ignore:
-#       - 'iac/**'
-#       - 'README.md'
+# This is a demo repository so make sure your AWS environment
+# is set up correctly with CodeBuild runners
+on:
+  push:
+    paths-ignore:
+      - 'iac/**'
+      - 'README.md'
 
 env:
   AWS_REGION: us-east-2
