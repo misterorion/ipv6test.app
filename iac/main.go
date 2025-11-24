@@ -1,17 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"net/url"
 
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/cloudfront"
-	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/ecr"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/iam"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/lambda"
 	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/logs"
-	"github.com/pulumi/pulumi-aws-native/sdk/go/aws/s3"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/route53"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi/config"
@@ -33,9 +32,12 @@ var (
 		},
 	}
 	err error
+
+	lambdaImageTag = "45b5825"
+	bucketOacId    = "E1UT8NIVK58ZX6"
 )
 
-func newDnsRecord(ctx *pulumi.Context, name string, dns string, zoneId pulumi.StringOutput, domain pulumi.StringOutput, recordType route53.RecordType) error {
+func newDnsRecord(ctx *pulumi.Context, name string, dns string, zoneId pulumi.StringOutput, domain pulumi.StringOutput, recordType route53.RecordType, provider *aws.Provider) error {
 	_, err = route53.NewRecord(ctx, name, &route53.RecordArgs{
 		ZoneId: zoneId,
 		Name:   pulumi.String(dns),
@@ -47,7 +49,7 @@ func newDnsRecord(ctx *pulumi.Context, name string, dns string, zoneId pulumi.St
 				ZoneId:               pulumi.String(cloudFrontDefaultZoneId),
 			},
 		},
-	}, pulumi.DeleteBeforeReplace(true))
+	}, pulumi.DeleteBeforeReplace(true), pulumi.Provider(provider))
 	if err != nil {
 		return err
 	}
@@ -60,12 +62,19 @@ func main() {
 
 		config := config.New(ctx, "")
 		accountId := config.RequireSecret("account-id")
-		bucketName := config.RequireSecret("bucket-name")
 
-		// S3 Bucket for Assets
+		// for Route53
+		managementProvider, err := aws.NewProvider(ctx, "management-provider", &aws.ProviderArgs{
+			Profile: pulumi.String("default"),
+			Region:  pulumi.String("us-east-1"),
+		})
+		if err != nil {
+			return err
+		}
 
-		bucket, err := s3.NewBucket(ctx, "bucket", &s3.BucketArgs{
-			BucketName: bucketName,
+		prodProvider, err := aws.NewProvider(ctx, "prod-provider", &aws.ProviderArgs{
+			Profile: pulumi.String("prod"),
+			Region:  pulumi.String("us-east-2"),
 		})
 		if err != nil {
 			return err
@@ -73,42 +82,11 @@ func main() {
 
 		// Lambda function
 
-		_, err = ecr.NewRepository(ctx, "ecr-repo", &ecr.RepositoryArgs{
-			EmptyOnDelete: pulumi.Bool(true),
-			ImageScanningConfiguration: ecr.RepositoryImageScanningConfigurationArgs{
-				ScanOnPush: pulumi.Bool(true),
-			},
-			ImageTagMutability: ecr.RepositoryImageTagMutabilityImmutable,
-			LifecyclePolicy: &ecr.RepositoryLifecyclePolicyArgs{
-				LifecyclePolicyText: pulumi.String(`{
-					"rules": [
-						{
-							"rulePriority": 1,
-							"description": "Expire old images",
-							"selection": {
-								"tagStatus": "any",
-								"countType": "imageCountMoreThan",
-								"countNumber": 2
-							},
-							"action": {
-								"type": "expire"
-							}
-						}
-					]
-				}`),
-			},
-			RepositoryName: pulumi.String("lambda/ipv6test"),
-			Tags:           commonTags,
-		})
-		if err != nil {
-			return err
-		}
-
 		logGroup, err := logs.NewLogGroup(ctx, "log-group", &logs.LogGroupArgs{
 			LogGroupName:    pulumi.String("/aws/lambda/ipv6test"),
 			RetentionInDays: pulumi.Int(7),
 			Tags:            commonTags,
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -131,7 +109,7 @@ func main() {
 			},
 			RoleName: pulumi.String("lambda-ipv6test-role"),
 			Tags:     commonTags,
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -141,7 +119,7 @@ func main() {
 				lambda.FunctionArchitecturesItemArm64,
 			},
 			Code: lambda.FunctionCodeArgs{
-				ImageUri: pulumi.Sprintf("%v.dkr.ecr.us-east-2.amazonaws.com/base:latest", accountId), // placeholder; build in GitHub to deploy
+				ImageUri: pulumi.Sprintf("%v.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test:%s", accountId, lambdaImageTag), // placeholder; build in GitHub to deploy
 			},
 			Description:  pulumi.String("Send static web page"),
 			FunctionName: pulumi.String("ipv6test"),
@@ -153,14 +131,14 @@ func main() {
 			Role:                         role.Arn,
 			Tags:                         commonTags,
 			Timeout:                      pulumi.Int(30),
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
 
 		version, err := lambda.NewVersion(ctx, "version", &lambda.VersionArgs{
 			FunctionName: function.FunctionName.Elem().ToStringOutput(),
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -170,7 +148,7 @@ func main() {
 			FunctionName:    function.FunctionName.Elem().ToStringOutput(),
 			Name:            pulumi.String("main"),
 			Description:     pulumi.String("Live site from main branch"),
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -179,7 +157,7 @@ func main() {
 			AuthType:          lambda.UrlAuthTypeAwsIam,
 			Qualifier:         alias.Name,
 			TargetFunctionArn: function.Arn,
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -199,35 +177,22 @@ func main() {
 			},
 			FunctionCode: pulumi.String(functionCode),
 			Name:         pulumi.String("pass-true-client-ip"),
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
 
 		// CloudFront access controls
 
-		oacS3, err := cloudfront.NewOriginAccessControl(ctx, "s3", &cloudfront.OriginAccessControlArgs{
-			OriginAccessControlConfig: &cloudfront.OriginAccessControlConfigArgs{
-				Description:                   pulumi.String("Access to static assets"),
-				Name:                          pulumi.String("s3-bucket-access"),
-				SigningBehavior:               pulumi.String("always"),
-				SigningProtocol:               pulumi.String("sigv4"),
-				OriginAccessControlOriginType: pulumi.String("s3"),
-			},
-		})
-		if err != nil {
-			return err
-		}
-
 		oacLambda, err := cloudfront.NewOriginAccessControl(ctx, "lambda", &cloudfront.OriginAccessControlArgs{
 			OriginAccessControlConfig: &cloudfront.OriginAccessControlConfigArgs{
 				Description:                   pulumi.String("Access to Lambda function"),
-				Name:                          pulumi.String("Lambda function access"),
+				Name:                          pulumi.String("lambda-access-ipv6test"),
 				SigningBehavior:               pulumi.String("always"),
 				SigningProtocol:               pulumi.String("sigv4"),
 				OriginAccessControlOriginType: pulumi.String("lambda"),
 			},
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -248,7 +213,7 @@ func main() {
 				},
 				Name: pulumi.String("cache-one-day"),
 			},
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -267,7 +232,7 @@ func main() {
 				},
 				Name: pulumi.String("cache-one-week"),
 			},
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -314,7 +279,7 @@ func main() {
 					},
 				},
 			},
-		})
+		}, pulumi.Provider(prodProvider))
 		if err != nil {
 			return err
 		}
@@ -340,8 +305,6 @@ func main() {
 				certArn: config.RequireSecret("certArn-v4.ipv6test.app"),
 			},
 		}
-
-		distributionIds := []pulumi.IDOutput{}
 
 		for _, distributionConfig := range distributionConfigs {
 			distribution, err := cloudfront.NewDistribution(ctx, distributionConfig.dns, &cloudfront.DistributionArgs{
@@ -483,9 +446,10 @@ func main() {
 						&cloudfront.DistributionOriginArgs{
 							ConnectionAttempts:    pulumi.Int(3),
 							ConnectionTimeout:     pulumi.Int(10),
-							DomainName:            bucket.DomainName,
+							DomainName:            config.RequireSecret("bucket-regional-domain-name"),
+							OriginPath:            pulumi.String("/ipv6test.app"),
 							Id:                    pulumi.String("S3"),
-							OriginAccessControlId: oacS3.ID(),
+							OriginAccessControlId: pulumi.String(bucketOacId),
 							S3OriginConfig: cloudfront.DistributionS3OriginConfigArgs{
 								OriginAccessIdentity: pulumi.String(""),
 							},
@@ -517,6 +481,7 @@ func main() {
 							},
 						},
 					},
+					WebAclId: config.RequireSecret("web-acl-id"),
 					ViewerCertificate: &cloudfront.DistributionViewerCertificateArgs{
 						AcmCertificateArn:      distributionConfig.certArn,
 						MinimumProtocolVersion: pulumi.String("TLSv1.2_2021"),
@@ -524,79 +489,58 @@ func main() {
 					},
 				},
 				Tags: commonTags,
-			})
+			}, pulumi.Provider(prodProvider))
 			if err != nil {
 				return err
 			}
 
-			distributionIds = append(distributionIds, distribution.ID())
-
-			_, err = lambda.NewPermission(ctx, distributionConfig.dns, &lambda.PermissionArgs{
+			_, err = lambda.NewPermission(ctx, fmt.Sprintf("%v-invokeUrl", distributionConfig.dns), &lambda.PermissionArgs{
 				Action:       pulumi.String("lambda:InvokeFunctionUrl"),
 				FunctionName: pulumi.Sprintf("%v:%v", function.Arn, alias.Name),
 				Principal:    pulumi.String("cloudfront.amazonaws.com"),
 				SourceArn:    pulumi.Sprintf("arn:aws:cloudfront::%v:distribution/%v", accountId, distribution.ID()),
-			})
+			}, pulumi.Provider(prodProvider))
+			if err != nil {
+				return err
+			}
+
+			_, err = lambda.NewPermission(ctx, fmt.Sprintf("%v-invoke", distributionConfig.dns), &lambda.PermissionArgs{
+				Action:       pulumi.String("lambda:InvokeFunction"),
+				FunctionName: pulumi.Sprintf("%v:%v", function.Arn, alias.Name),
+				Principal:    pulumi.String("cloudfront.amazonaws.com"),
+				SourceArn:    pulumi.Sprintf("arn:aws:cloudfront::%v:distribution/%v", accountId, distribution.ID()),
+			}, pulumi.Provider(prodProvider))
 			if err != nil {
 				return err
 			}
 
 			zoneId := config.RequireSecret("route53-zone-id")
+
 			if distributionConfig.dns == "ipv6test.app" {
-				err = newDnsRecord(ctx, "ipv6test-a", "ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeA)
+				err = newDnsRecord(ctx, "ipv6test-a", "ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeA, managementProvider)
 				if err != nil {
 					return err
 				}
 
-				err = newDnsRecord(ctx, "ipv6test-aaaa", "ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeAAAA)
+				err = newDnsRecord(ctx, "ipv6test-aaaa", "ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeAAAA, managementProvider)
 				if err != nil {
 					return err
 				}
 			}
 
 			if distributionConfig.dns == "v6.ipv6test.app" {
-				err = newDnsRecord(ctx, "v6-ipv6test-aaaa", "v6.ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeAAAA)
+				err = newDnsRecord(ctx, "v6-ipv6test-aaaa", "v6.ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeAAAA, managementProvider)
 				if err != nil {
 					return err
 				}
 			}
 
 			if distributionConfig.dns == "v4.ipv6test.app" {
-				err = newDnsRecord(ctx, "v4-ipv6test-a", "v4.ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeA)
+				err = newDnsRecord(ctx, "v4-ipv6test-a", "v4.ipv6test.app", zoneId, distribution.DomainName, route53.RecordTypeA, managementProvider)
 				if err != nil {
 					return err
 				}
 			}
-		}
-
-		_, err = s3.NewBucketPolicy(ctx, "policy", &s3.BucketPolicyArgs{
-			Bucket: bucketName,
-			PolicyDocument: pulumi.Sprintf(`{
-				"Version": "2008-10-17",
-				"Id": "PolicyForCloudFrontPrivateContent",
-				"Statement": [
-					{
-						"Effect": "Allow",
-						"Principal": {
-							"Service": "cloudfront.amazonaws.com"
-						},
-						"Action": "s3:GetObject",
-						"Resource": "arn:aws:s3:::%v/*",
-						"Condition": {
-							"StringLike": {
-								"AWS:SourceArn": [
-									"arn:aws:cloudfront::%v:distribution/%v",
-									"arn:aws:cloudfront::%v:distribution/%v",
-									"arn:aws:cloudfront::%v:distribution/%v"
-								]
-							}
-						}
-					}
-				]
-			}`, bucketName, accountId, distributionIds[0], accountId, distributionIds[1], accountId, distributionIds[2]),
-		})
-		if err != nil {
-			return err
 		}
 
 		return nil
