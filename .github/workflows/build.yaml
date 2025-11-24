@@ -1,0 +1,87 @@
+name: Build
+
+# This is a demo repository so ensure this workflow never runs
+# on:
+#   push:
+#     paths-ignore:
+#       - 'iac/**'
+#       - 'README.md'
+
+env:
+  AWS_REGION: us-east-2
+
+jobs:
+  build-backend:
+    runs-on:
+      - codebuild-lambda-${{ github.run_id }}-${{ github.run_attempt }}
+        image:arm-lambda-go1.24
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Build Go Binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
+            go build -ldflags="-s -w" -tags lambda.norpc -o main src/main.go
+
+      - name: Upload Lambda Binary
+        uses: actions/upload-artifact@v5
+        with:
+          name: lambda-bin
+          path: main
+          retention-days: 1
+          if-no-files-found: error
+
+  build-frontend:
+    runs-on: codebuild-lambda-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Install Dependencies & Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Sync to S3
+        run: |
+          aws s3 sync ./static ${{ secrets.S3_URI }} \
+            --delete \
+            --no-progress \
+            --only-show-errors
+
+  docker-packaging:
+    runs-on: codebuild-ec2-container-${{ github.run_id }}-${{ github.run_attempt }}
+    needs: [build-frontend, build-backend]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v5
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        id: build-image
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+        run: ./.github/scripts/build-image.sh
+    outputs:
+      tag: ${{ steps.build-image.outputs.tag }}
+
+  deploy-function:
+    runs-on: codebuild-lambda-${{ github.run_id }}-${{ github.run_attempt }}
+    needs: [docker-packaging]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Deploy function
+        env:
+          ECR_REPO: ${{ secrets.ECR_REPO }}
+          FUNCTION_NAME: ipv6test
+          REPOSITORY_NAME: lambda/ipv6test
+          TAG: ${{ needs.docker-packaging.outputs.tag }}
+        run: ./.github/scripts/deploy-function.sh
