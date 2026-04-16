@@ -1,0 +1,18 @@
+encryptionsalt: v1:9/yGWkQ9s+c=:v1:faOn9xsniu5EEn7A:VpamD9AQHG+HashyDL6Gz5fSRtT47Q==
+config:
+  ipv6test:account-id:
+    secure: v1:E99IV3MXfTj4rL5e:bTmsYvh9fhox5QF60GAkDpcP+I5SFqnkehAdGA==
+  ipv6test:certArn-ipv6test.app:
+    secure: v1:oLd8N3WOoPaCHWl0:wj4bNDpFQHIIToN1l9hOnCC3heojytsJ1GcTVkVr4aM+4fa8JU6lNinZ67Ox2mqGMs6KyvDfRj7lwsLoWQIXoYfuovcm8oEFvzFf5FCibFjz9EYgQD09A/pp7liz8R1l0UQc
+  ipv6test:certArn-v4.ipv6test.app:
+    secure: v1:LzXLh3lWC/W1atkp:tWn/hYUzSYBsyPPI6aeDxzk5EyRSgBUeQ6fWIvoIz6cEBEj0c1FCnbvZ5emJMfvE6bq4O7MzJ+eV0T/NfzxDJvCaxjbeWg3VZnTk+AIcaeLBV36u6UwpArtkR0AxKBN+R0R8
+  ipv6test:certArn-v6.ipv6test.app:
+    secure: v1:j7M2MrySHtmfOB5+:xEyAIOX+uSqSHGgfT6EEu3LMxQgqHLethOspQCzagX7XBZvT5ZRz+Ey5eW26trxHLSkHk+Yl5xRQsJApD4mXHC3kxDtnmxS2xkAX4qqbv5ZdlgkfyHr8zMj68euyWyRBOTQy
+  ipv6test:route53-zone-id:
+    secure: v1:ABJmRTfrJWjPjAeY:h70vKMFFTJ5BHZvKBEf3MZRhwuuzqk3xuNZ/SpdTtvTWZ3u/Jg==
+  ipv6test:bucket-regional-domain-name:
+    secure: v1:3hq1mUbkoe8zJlAF:dwisXS14NveCnzOY1DDvxNffPiQyE1PgIuUIE9OmRYwhtRt/FQrnW/avh037aOsxcfEeKcMKZwdn+JObZie5k9yIu5CNL+OHrJ4D5+7u
+  ipv6test:web-acl-id:
+    secure: v1:qd1DJy3jPfdW1TOo:WXnirdgKbUMuonrJxGb7xeyH+clY0wRMC+E43+W4cjspLM3MTFQAITtEeF5p3dkKR04nj1n71IMMLgKAJ0K3sXF+TP4W1xquO/jO1xyLnaQHC3JDGApd49Kur96KtzCHMqxkS2BL0jeYfdv9
+  aws-native:profile: apps
+  aws-native:region: us-east-2

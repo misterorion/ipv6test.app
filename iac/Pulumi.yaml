@@ -1,0 +1,3 @@
+name: ipv6test
+runtime: go
+description: CloudFront, S3 and Lambda resources
