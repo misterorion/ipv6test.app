@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    paths-ignore:
+      - 'iac/**'
+      - 'README.md'
+
+jobs:
+  build-frontend:
+    runs-on: docker
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Install Dependencies & Build
+        run: npm ci && npm run build
+
+      - name: Sync to S3
+        run: >
+          aws s3 sync ./static ${{ vars.S3_STATIC_BASE }}/ipv6test.app
+          --delete
+          --no-progress
+
+  docker-packaging:
+    runs-on: docker
+    needs: [build-frontend]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Build Go Binary
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
+            go build -ldflags="-s -w" -tags lambda.norpc -o main src/main.go
+
+      - name: Build image
+        id: build-image
+        env:
+          CONTEXT: .
+          ECR_REPO: ${{ vars.ECR_REPO }}
+        run: ./.forgejo/scripts/build-image.sh
+    outputs:
+      tag: ${{ steps.build-image.outputs.tag }}
+
+  deploy-function:
+    runs-on: docker
+    needs: [docker-packaging]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Deploy function
+        env:
+          ECR_REPO: ${{ vars.ECR_REPO }}
+          FUNCTION_NAME: ipv6test
+          REPOSITORY_NAME: lambda/ipv6test
+          TAG: ${{ needs.docker-packaging.outputs.tag }}
+        run: ./.forgejo/scripts/deploy-function.sh
