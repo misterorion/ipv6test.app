@@ -10,7 +10,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.2",
     "cssnano": "^7.1.5",
-    "postcss": "^8.5.8",
+    "postcss": "^8.5.10",
     "postcss-cli": "^11.0.1",
     "tailwindcss": "^4.2.2",
     "uglify-js": "^3.19.3"
