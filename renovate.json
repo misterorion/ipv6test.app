@@ -6,14 +6,12 @@
   "enabledManagers": ["npm"],
   "rangeStrategy": "bump",
   "branchPrefix": "renovate-",
+  "rebaseWhen": "behind-base-branch",
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["major"],
-      "automerge": false
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "groupName": "all npm dependencies"
     }
   ]
 }
