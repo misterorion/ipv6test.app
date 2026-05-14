@@ -29,11 +29,6 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
 
-      - name: Build Go Binary
-        run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
-            go build -ldflags="-s -w" -tags lambda.norpc -o main src/main.go
-
       - name: Build image
         id: build-image
         env:
