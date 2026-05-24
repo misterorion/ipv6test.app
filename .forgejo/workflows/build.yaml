@@ -17,6 +17,7 @@ jobs:
         run: npm ci && npm run build
 
       - name: Sync to S3
+        if: ${{ (forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/main') }}
         run: >
           aws s3 sync ./static ${{ vars.S3_STATIC_BASE }}/ipv6test.app
           --delete
@@ -26,19 +27,27 @@ jobs:
     runs-on: docker
     needs: [build-frontend]
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Build image
-        id: build-image
-        env:
-          CONTEXT: .
-          ECR_REPO: ${{ vars.ECR_REPO }}
-        run: ./.forgejo/scripts/build-image.sh
-    outputs:
-      tag: ${{ steps.build-image.outputs.tag }}
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ vars.ECR_REPO }}
+          tags: type=sha,format=short,prefix=
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: ${{ (forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/main') }}
+          platforms: linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
   deploy-function:
+    if: ${{ (forgejo.event_name == 'push' && forgejo.ref == 'refs/heads/main') }}
     runs-on: docker
     needs: [docker-packaging]
     steps:
@@ -50,5 +59,17 @@ jobs:
           ECR_REPO: ${{ vars.ECR_REPO }}
           FUNCTION_NAME: ipv6test
           REPOSITORY_NAME: lambda/ipv6test
-          TAG: ${{ needs.docker-packaging.outputs.tag }}
+          TAG:  ${{ steps.meta.outputs.tag-names }}
         run: ./.forgejo/scripts/deploy-function.sh
+
+  notify:
+    name: Notify Google Chat
+    runs-on: docker
+    if: always()
+    needs: [build-frontend, docker-packaging, deploy-function]
+    steps:
+      - name: Notify Google Chat
+        uses: https://forgejo.pegasus.mechapower.com/mechapower/shared-actions/notify-chat@main
+        with:
+          webhook_url: ${{ secrets.CHAT_WEBHOOK_URL }}
+          status: ${{ contains(needs.*.result, 'failure') && 'failure' || contains(needs.*.result, 'cancelled') && 'cancelled' || 'success' }}

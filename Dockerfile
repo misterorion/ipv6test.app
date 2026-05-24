@@ -8,5 +8,5 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 \
 
 FROM scratch
 COPY --from=builder --chmod=755 /out/main ./main
-COPY version src/index.tmpl ./
+COPY src/index.tmpl ./
 ENTRYPOINT [ "./main" ]
