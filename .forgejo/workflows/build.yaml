@@ -26,6 +26,8 @@ jobs:
   docker-packaging:
     runs-on: docker
     needs: [build-frontend]
+    outputs:
+      tag: ${{ steps.meta.outputs.version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -59,7 +61,7 @@ jobs:
           ECR_REPO: ${{ vars.ECR_REPO }}
           FUNCTION_NAME: ipv6test
           REPOSITORY_NAME: lambda/ipv6test
-          TAG:  ${{ steps.meta.outputs.tag-names }}
+          TAG: ${{ needs.docker-packaging.outputs.tag }}
         run: ./.forgejo/scripts/deploy-function.sh
 
   notify:

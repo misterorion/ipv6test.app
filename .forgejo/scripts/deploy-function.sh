@@ -1,4 +1,10 @@
 #!/bin/bash
+
+: "${TAG:?TAG is empty}"
+: "${ECR_REPO:?ECR_REPO is empty}"
+: "${FUNCTION_NAME:?FUNCTION_NAME is empty}"
+: "${REPOSITORY_NAME:?REPOSITORY_NAME is empty}"
+
 set -euo pipefail
 
 # 1. Get the Image Digest (Keeps deployment immutable/safe)
