@@ -1,0 +1,78 @@
+when:
+  # Every branch builds; only main syncs, pushes and deploys (see step `when`s).
+  - event: push
+    path:
+      exclude: ['iac/**', 'README.md']
+  - event: manual
+
+steps:
+  - name: build-frontend
+    image: public.ecr.aws/docker/library/node:24-slim
+    commands:
+      - npm ci
+      - npm run build
+
+  - name: sync-static
+    image: forgejo.pegasus.mechapower.com/mechapower/s3-deploy:1
+    settings:
+      domain: ipv6test.app
+      source: static
+      s3_static_base:
+        from_secret: s3_static_base
+    when: &main
+      - branch: main
+
+  # Other branches: verify the image builds; nothing is pushed.
+  - name: check-image
+    image: &buildx forgejo.pegasus.mechapower.com/mechapower/ecr-buildx:1
+    settings:
+      <<: &image
+        repo: 784063839306.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test
+        platforms: linux/arm64
+        # Lambda rejects the manifest list that provenance attestations create.
+        provenance: "false"
+        tags:
+          - ${CI_COMMIT_SHA:0:7}
+      dry_run: true
+    when:
+      - branch:
+          exclude: main
+
+  - name: build-image
+    image: *buildx
+    settings: *image
+    when: *main
+
+  - name: deploy-function
+    image: public.ecr.aws/aws-cli/aws-cli:latest
+    environment:
+      TAG: ${CI_COMMIT_SHA:0:7}
+      ECR_REPO: 784063839306.dkr.ecr.us-east-2.amazonaws.com/lambda/ipv6test
+      REPOSITORY_NAME: lambda/ipv6test
+      FUNCTION_NAME: ipv6test
+      AWS_REGION: us-east-2
+      AWS_ROLE_ARN: arn:aws:iam::784063839306:role/talos-forgejo-runner
+      AWS_WEB_IDENTITY_TOKEN_FILE: /var/run/secrets/eks.amazonaws.com/serviceaccount/token
+      AWS_STS_REGIONAL_ENDPOINTS: regional
+      AWS_PAGER: ""
+    commands:
+      - bash .forgejo/scripts/deploy-function.sh
+    when: *main
+
+  - name: notify-success
+    image: forgejo.pegasus.mechapower.com/mechapower/chat-notify:1
+    settings:
+      status: success
+      webhook_url:
+        from_secret: chat_webhook_url
+    when:
+      - status: [success]
+
+  - name: notify-failure
+    image: forgejo.pegasus.mechapower.com/mechapower/chat-notify:1
+    settings:
+      status: failure
+      webhook_url:
+        from_secret: chat_webhook_url
+    when:
+      - status: [failure]
